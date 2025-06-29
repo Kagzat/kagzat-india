@@ -32,38 +32,50 @@ const ValidationMetrics = () => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Weekly Activity</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-4">
+          <CardTitle className="truncate">Weekly Activity</CardTitle>
         </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={weeklyData}>
-                <XAxis dataKey="day" />
-                <YAxis />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="completed" fill="var(--color-completed)" radius={4} />
-                <Bar dataKey="pending" fill="var(--color-pending)" radius={4} />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
+        <CardContent className="p-4">
+          <div className="w-full overflow-hidden">
+            <ChartContainer config={chartConfig} className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={weeklyData} margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+                  <XAxis 
+                    dataKey="day" 
+                    tick={{ fontSize: 12 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    tickLine={false}
+                    axisLine={false}
+                    width={30}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="completed" fill="var(--color-completed)" radius={4} />
+                  <Bar dataKey="pending" fill="var(--color-pending)" radius={4} />
+                </BarChart>
+              </ResponsiveContainer>
+            </ChartContainer>
+          </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Department Performance</CardTitle>
+      <Card className="overflow-hidden">
+        <CardHeader className="pb-4">
+          <CardTitle className="truncate">Department Performance</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="p-4">
+          <div className="space-y-4 overflow-hidden">
             {departmentData.map((dept, index) => (
-              <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <h4 className="font-medium text-gray-900">{dept.department}</h4>
-                  <p className="text-sm text-gray-600">Avg. completion: {dept.avg_time} days</p>
+              <div key={index} className="flex items-center justify-between p-3 border rounded-lg min-w-0">
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-medium text-gray-900 truncate">{dept.department}</h4>
+                  <p className="text-sm text-gray-600 truncate">Avg. completion: {dept.avg_time} days</p>
                 </div>
-                <div className="text-right">
+                <div className="text-right flex-shrink-0 ml-4">
                   <p className="text-lg font-bold text-green-600">{dept.success}%</p>
                   <p className="text-xs text-gray-500">Success rate</p>
                 </div>

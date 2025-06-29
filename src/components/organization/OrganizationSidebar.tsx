@@ -81,7 +81,7 @@ const OrganizationSidebar = ({ open, onToggle }: OrganizationSidebarProps) => {
                 <button
                   key={item.id}
                   onClick={() => setActiveItem(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center ${open ? 'justify-start space-x-3 px-3' : 'justify-center px-2'} py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive 
                       ? 'bg-purple-50 text-purple-700 border border-purple-200' 
                       : 'text-gray-700 hover:bg-gray-50'
@@ -90,9 +90,9 @@ const OrganizationSidebar = ({ open, onToggle }: OrganizationSidebarProps) => {
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   {open && (
                     <>
-                      <span className="flex-1 text-left">{item.label}</span>
+                      <span className="flex-1 text-left truncate">{item.label}</span>
                       {item.badge && (
-                        <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs">
+                        <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs flex-shrink-0">
                           {item.badge}
                         </Badge>
                       )}

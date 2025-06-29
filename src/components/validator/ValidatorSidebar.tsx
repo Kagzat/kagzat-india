@@ -77,7 +77,7 @@ const ValidatorSidebar = ({ open, onToggle }: ValidatorSidebarProps) => {
                 <button
                   key={item.id}
                   onClick={() => setActiveItem(item.id)}
-                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`w-full flex items-center ${open ? 'justify-start space-x-3 px-3' : 'justify-center px-2'} py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive 
                       ? 'bg-blue-50 text-blue-700 border border-blue-200' 
                       : 'text-gray-700 hover:bg-gray-50'
@@ -86,9 +86,9 @@ const ValidatorSidebar = ({ open, onToggle }: ValidatorSidebarProps) => {
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   {open && (
                     <>
-                      <span className="flex-1 text-left">{item.label}</span>
+                      <span className="flex-1 text-left truncate">{item.label}</span>
                       {item.badge && (
-                        <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
+                        <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs flex-shrink-0">
                           {item.badge}
                         </Badge>
                       )}
