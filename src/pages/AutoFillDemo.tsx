@@ -8,6 +8,11 @@ import ServiceSelection from '@/components/autofill/ServiceSelection';
 import DocumentAnalysis from '@/components/autofill/DocumentAnalysis';
 import AutoFilledForm from '@/components/autofill/AutoFilledForm';
 import SubmissionPreview from '@/components/autofill/SubmissionPreview';
+import FinalReview from '@/components/autofill/FinalReview';
+import PaymentGateway from '@/components/autofill/PaymentGateway';
+import PaymentProcessing from '@/components/autofill/PaymentProcessing';
+import PaymentSuccess from '@/components/autofill/PaymentSuccess';
+import NotificationDemo from '@/components/autofill/NotificationDemo';
 
 const AutoFillDemo = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -49,12 +54,62 @@ const AutoFillDemo = () => {
         return (
           <SubmissionPreview 
             service={serviceData}
-            onBack={() => setCurrentStep(3)} 
+            onBack={() => setCurrentStep(3)}
+            onNext={() => setCurrentStep(5)}
+          />
+        );
+      case 5:
+        return (
+          <FinalReview 
+            service={serviceData}
+            onBack={() => setCurrentStep(4)}
+            onNext={() => setCurrentStep(6)}
+          />
+        );
+      case 6:
+        return (
+          <PaymentGateway 
+            amount={3599}
+            onBack={() => setCurrentStep(5)}
+            onNext={() => setCurrentStep(7)}
+          />
+        );
+      case 7:
+        return (
+          <PaymentProcessing 
+            onComplete={() => setCurrentStep(8)}
+          />
+        );
+      case 8:
+        return (
+          <PaymentSuccess 
+            onNext={() => setCurrentStep(9)}
+          />
+        );
+      case 9:
+        return (
+          <NotificationDemo 
+            onBack={() => setCurrentStep(1)}
           />
         );
       default:
         return null;
     }
+  };
+
+  const getStepName = () => {
+    const stepNames = [
+      "Service Selection",
+      "Document Analysis", 
+      "Auto-Filled Form",
+      "Submission Preview",
+      "Final Review",
+      "Payment Gateway",
+      "Payment Processing",
+      "Payment Success",
+      "Notifications"
+    ];
+    return stepNames[currentStep - 1] || "";
   };
 
   return (
@@ -64,18 +119,18 @@ const AutoFillDemo = () => {
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Auto-Fill Demo</h1>
-            <div className="flex items-center space-x-4">
-              {[1, 2, 3, 4].map((step) => (
+            <div className="flex items-center space-x-2">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((step) => (
                 <div key={step} className="flex items-center">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                     currentStep >= step 
                       ? 'bg-blue-600 text-white' 
                       : 'bg-gray-200 text-gray-600'
                   }`}>
                     {step}
                   </div>
-                  {step < 4 && (
-                    <ArrowRight className={`ml-2 h-4 w-4 ${
+                  {step < 9 && (
+                    <ArrowRight className={`ml-1 mr-1 h-3 w-3 ${
                       currentStep > step ? 'text-blue-600' : 'text-gray-400'
                     }`} />
                   )}
@@ -84,10 +139,7 @@ const AutoFillDemo = () => {
             </div>
           </div>
           <div className="mt-2 text-sm text-gray-600">
-            {currentStep === 1 && "Service Selection"}
-            {currentStep === 2 && "Document Analysis"}
-            {currentStep === 3 && "Auto-Filled Form"}
-            {currentStep === 4 && "Submission Preview"}
+            Step {currentStep} of 9: {getStepName()}
           </div>
         </div>
       </div>

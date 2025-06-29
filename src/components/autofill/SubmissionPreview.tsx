@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,9 +13,10 @@ interface SubmissionPreviewProps {
     timeRange: string;
   };
   onBack: () => void;
+  onNext: () => void;
 }
 
-const SubmissionPreview = ({ service, onBack }: SubmissionPreviewProps) => {
+const SubmissionPreview = ({ service, onBack, onNext }: SubmissionPreviewProps) => {
   const submissionData = {
     fullName: "Rajesh Kumar",
     studentId: "HBS2019-1247",
@@ -221,9 +221,9 @@ const SubmissionPreview = ({ service, onBack }: SubmissionPreviewProps) => {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Edit
             </Button>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button onClick={onNext} className="w-full bg-green-600 hover:bg-green-700 text-white">
               <CreditCard className="h-4 w-4 mr-2" />
-              Confirm & Pay ₹{costBreakdown.total.toLocaleString()}
+              Continue to Review
             </Button>
           </div>
 
