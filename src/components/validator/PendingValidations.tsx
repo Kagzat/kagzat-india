@@ -1,10 +1,14 @@
 
+import { useState } from 'react';
 import { AlertTriangle, Clock, FileText, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import ValidationWorkflow from './ValidationWorkflow';
 
 const PendingValidations = () => {
+  const [selectedValidation, setSelectedValidation] = useState<string | null>(null);
+
   const urgentValidation = {
     id: 'URG-001',
     document: 'IIT Delhi Engineering Degree',
@@ -44,6 +48,10 @@ const PendingValidations = () => {
     }
   ];
 
+  const handleStartValidation = (id: string) => {
+    setSelectedValidation(id);
+  };
+
   return (
     <div className="space-y-6">
       {/* Urgent Validations */}
@@ -79,7 +87,11 @@ const PendingValidations = () => {
                   </div>
                 </div>
               </div>
-              <Button variant="destructive" size="sm">
+              <Button 
+                variant="destructive" 
+                size="sm"
+                onClick={() => handleStartValidation(urgentValidation.id)}
+              >
                 Review Now
               </Button>
             </div>
@@ -131,7 +143,11 @@ const PendingValidations = () => {
                       {item.status}
                     </Badge>
                   </div>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleStartValidation(item.id)}
+                  >
                     Start Validation
                   </Button>
                 </div>
@@ -140,6 +156,14 @@ const PendingValidations = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Validation Workflow Modal */}
+      {selectedValidation && (
+        <ValidationWorkflow
+          requestId={selectedValidation}
+          onClose={() => setSelectedValidation(null)}
+        />
+      )}
     </div>
   );
 };

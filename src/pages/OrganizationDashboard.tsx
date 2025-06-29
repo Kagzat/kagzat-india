@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Users, FileText, TrendingUp, DollarSign, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +8,7 @@ import TeamManagement from '@/components/organization/TeamManagement';
 import TeamRequests from '@/components/organization/TeamRequests';
 import ValidationMetrics from '@/components/organization/ValidationMetrics';
 import BulkOperations from '@/components/organization/BulkOperations';
+import AddValidatorModal from '@/components/organization/AddValidatorModal';
 import FormBuilder from '@/pages/FormBuilder';
 
 const OrganizationDashboard = () => {
@@ -67,10 +67,14 @@ const OrganizationDashboard = () => {
               <h1 className="text-xl lg:text-2xl font-bold text-gray-900">Organization Dashboard</h1>
               <p className="text-gray-600 mt-1">Harvard Business School</p>
             </div>
-            <Button className="w-full sm:w-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Add New Validator
-            </Button>
+            <AddValidatorModal
+              trigger={
+                <Button className="w-full sm:w-auto">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Validator
+                </Button>
+              }
+            />
           </div>
         </div>
 

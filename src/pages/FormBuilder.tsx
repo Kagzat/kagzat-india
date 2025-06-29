@@ -22,7 +22,8 @@ import {
   Redo,
   Trash2,
   GripVertical,
-  Plus
+  Plus,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 import { formFieldLibrary, documentLibrary, formatFieldName, formatDocumentName } from '@/lib/formLibrary';
 
 interface FormElement {
@@ -54,6 +56,9 @@ const FormBuilder = () => {
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
   const [formTitle, setFormTitle] = useState('Document Verification Form');
   const [activeTab, setActiveTab] = useState('basic');
+  const [isPublished, setIsPublished] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
   const [formElements, setFormElements] = useState<FormElement[]>([
     {
       id: '1',
@@ -108,6 +113,33 @@ const FormBuilder = () => {
     { type: 'file', label: 'File Upload', icon: Upload },
     { type: 'section', label: 'Section Header', icon: Minus },
   ];
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    toast({
+      title: "Form Saved",
+      description: "Your form has been saved as a draft.",
+    });
+    
+    setIsSaving(false);
+  };
+
+  const handlePublish = async () => {
+    setIsSaving(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setIsPublished(true);
+    toast({
+      title: "Form Published",
+      description: "Your form is now live and available for use.",
+    });
+    
+    setIsSaving(false);
+  };
 
   const handleDragEnd = (result: any) => {
     if (!result.destination) return;
@@ -395,12 +427,20 @@ const FormBuilder = () => {
         {/* Top Toolbar */}
         <div className="bg-white border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Input
+            <div className="flex items-center gap-4 flex-1">
+              <Textarea
                 value={formTitle}
                 onChange={(e) => setFormTitle(e.target.value)}
-                className="text-lg font-semibold border-none p-0 h-auto focus-visible:ring-0"
+                className="text-xl font-semibold border-none p-2 h-12 resize-none focus-visible:ring-1 focus-visible:ring-blue-500 bg-gray-50 hover:bg-gray-100 transition-colors"
+                placeholder="Enter form title..."
+                rows={1}
               />
+              {isPublished && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <Check className="h-4 w-4" />
+                  <span className="text-sm font-medium">Published</span>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="sm">
@@ -419,12 +459,30 @@ const FormBuilder = () => {
                 <Eye className="h-4 w-4 mr-2" />
                 {isPreviewMode ? 'Edit' : 'Preview'}
               </Button>
-              <Button>
+              <Button 
+                variant="outline" 
+                onClick={handleSave}
+                disabled={isSaving}
+              >
                 <Save className="h-4 w-4 mr-2" />
-                Save
+                {isSaving ? 'Saving...' : 'Save Draft'}
               </Button>
-              <Button className="bg-green-600 hover:bg-green-700">
-                Publish
+              <Button 
+                className={isPublished ? "bg-green-600 hover:bg-green-700" : "bg-blue-600 hover:bg-blue-700"}
+                onClick={handlePublish}
+                disabled={isSaving}
+              >
+                {isPublished ? (
+                  <>
+                    <Check className="h-4 w-4 mr-2" />
+                    Published
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    {isSaving ? 'Publishing...' : 'Publish'}
+                  </>
+                )}
               </Button>
             </div>
           </div>
