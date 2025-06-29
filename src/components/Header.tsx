@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,11 +34,13 @@ const Header = () => {
                 {link.name}
               </a>
             ))}
-            <Button 
-              className="bg-kagzat-yellow hover:bg-yellow-500 text-black font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:scale-105"
-            >
-              Join Waitlist
-            </Button>
+            <Link to="/waitlist">
+              <Button 
+                className="bg-kagzat-yellow hover:bg-yellow-500 text-black font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:scale-105"
+              >
+                Join Waitlist
+              </Button>
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -68,12 +71,14 @@ const Header = () => {
                   {link.name}
                 </a>
               ))}
-              <Button 
-                className="bg-kagzat-yellow hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg w-full mt-4"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Join Waitlist
-              </Button>
+              <Link to="/waitlist">
+                <Button 
+                  className="bg-kagzat-yellow hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg w-full mt-4"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Join Waitlist
+                </Button>
+              </Link>
             </div>
           </nav>
         )}
