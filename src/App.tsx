@@ -18,6 +18,8 @@ import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import AutoFillDemo from "./pages/AutoFillDemo";
 import ValidatorDashboard from "./pages/ValidatorDashboard";
+import UserDashboard from "./pages/UserDashboard";
+import OrganizationDashboard from "./pages/OrganizationDashboard";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ const App = () => (
           <Route path="/search" element={<Search />} />
           <Route path="/autofill-demo" element={<AutoFillDemo />} />
           <Route path="/validator-dashboard" element={<ValidatorDashboard />} />
+          <Route path="/user-dashboard" element={<UserDashboard />} />
+          <Route path="/organization-dashboard" element={<OrganizationDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
