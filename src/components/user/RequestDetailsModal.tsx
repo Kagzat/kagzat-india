@@ -24,6 +24,30 @@ import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
+interface BaseRequest {
+  id: string;
+  document: string;
+  validator: string;
+  submittedDate: string;
+  status: string;
+  progress: number;
+  fee: number;
+  priority: string;
+  estimatedCompletion: string;
+  submittedDocuments: Array<{
+    name: string;
+    size: string;
+    status: string;
+  }>;
+  submittedData: Record<string, string>;
+  timeline: Array<{
+    date: string;
+    event: string;
+    status: string;
+  }>;
+  additionalInfoRequest?: string;
+}
+
 interface RequestDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -34,7 +58,7 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
   const [additionalInfoResponse, setAdditionalInfoResponse] = useState('');
 
   // Mock data based on the request ID
-  const requestData = {
+  const requestData: Record<string, BaseRequest> = {
     'SUB-HBS-240629-001': {
       id: 'SUB-HBS-240629-001',
       document: 'Harvard MBA Certificate',
@@ -121,7 +145,7 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
     }
   };
 
-  const request = requestData[requestId as keyof typeof requestData];
+  const request = requestData[requestId];
 
   if (!request) {
     return null;
@@ -149,11 +173,6 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
     console.log('Additional info response:', additionalInfoResponse);
     setAdditionalInfoResponse('');
     // Here you would typically send the response to the backend
-  };
-
-  // Type guard to check if request has additionalInfoRequest
-  const hasAdditionalInfoRequest = (req: any): req is typeof request & { additionalInfoRequest: string } => {
-    return 'additionalInfoRequest' in req && typeof req.additionalInfoRequest === 'string';
   };
 
   return (
@@ -314,7 +333,7 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
             </Card>
 
             {/* Additional Info Request (if applicable) */}
-            {hasAdditionalInfoRequest(request) && (
+            {request.additionalInfoRequest && (
               <Card className="border-orange-200 bg-orange-50">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2 text-orange-800">
