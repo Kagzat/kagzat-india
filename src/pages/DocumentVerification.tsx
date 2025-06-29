@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,11 +5,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle, XCircle, AlertTriangle, Shield, Zap, Globe, Home, Briefcase, DollarSign, Handshake, Copy, Download, ExternalLink } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Shield, Zap, Globe, Home, Briefcase, DollarSign, Handshake, Copy, Download, ExternalLink, CreditCard, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 
 const DocumentVerification = () => {
-  const [verificationStep, setVerificationStep] = useState<'input' | 'processing' | 'result'>('input');
+  const [verificationStep, setVerificationStep] = useState<'input' | 'payment' | 'processing' | 'result'>('input');
   const [verificationResult, setVerificationResult] = useState<'success' | 'failed' | 'partial' | null>(null);
   const [formData, setFormData] = useState({
     driveLink: '',
@@ -18,6 +17,12 @@ const DocumentVerification = () => {
     documentType: '',
     purpose: '',
     expressVerification: false
+  });
+  const [paymentData, setPaymentData] = useState({
+    email: '',
+    phone: '',
+    upiId: '',
+    selectedMethod: 'upi'
   });
 
   const useCases = [
@@ -57,21 +62,34 @@ const DocumentVerification = () => {
     "Legal proceeding", "Personal verification", "Due diligence", "Other"
   ];
 
-  const handleVerification = () => {
+  const handleProceedToPayment = () => {
     if (!formData.driveLink || !formData.ownerDetails) {
       toast.error("Please fill in all required fields");
       return;
     }
+    setVerificationStep('payment');
+  };
 
-    setVerificationStep('processing');
+  const handlePayment = () => {
+    if (!paymentData.email || (!paymentData.upiId && paymentData.selectedMethod === 'upi')) {
+      toast.error("Please fill in all payment details");
+      return;
+    }
     
-    // Simulate verification process
+    toast.success("Payment processing...");
+    
+    // Simulate payment processing
     setTimeout(() => {
-      setVerificationStep('result');
-      // Randomly assign result for demo (in real app, this would be based on actual verification)
-      const results = ['success', 'failed', 'partial'];
-      setVerificationResult(results[Math.floor(Math.random() * results.length)] as any);
-    }, 3000);
+      toast.success("Payment successful! Starting verification...");
+      setVerificationStep('processing');
+      
+      // Start verification after payment
+      setTimeout(() => {
+        setVerificationStep('result');
+        const results = ['success', 'failed', 'partial'];
+        setVerificationResult(results[Math.floor(Math.random() * results.length)] as any);
+      }, 3000);
+    }, 2000);
   };
 
   const loadExample = () => {
@@ -89,6 +107,166 @@ const DocumentVerification = () => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
   };
+
+  if (verificationStep === 'payment') {
+    const amount = formData.expressVerification ? 150 : 75;
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Complete Payment</h1>
+            <p className="text-gray-600">Secure payment to proceed with document verification</p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Email Address *</label>
+                    <Input
+                      type="email"
+                      placeholder="your.email@example.com"
+                      value={paymentData.email}
+                      onChange={(e) => setPaymentData({ ...paymentData, email: e.target.value })}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">For payment receipt and verification updates</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Phone Number</label>
+                    <Input
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={paymentData.phone}
+                      onChange={(e) => setPaymentData({ ...paymentData, phone: e.target.value })}
+                    />
+                  </div>
+
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="font-medium">Payment Method</h3>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="radio"
+                          id="upi"
+                          name="paymentMethod"
+                          value="upi"
+                          checked={paymentData.selectedMethod === 'upi'}
+                          onChange={(e) => setPaymentData({ ...paymentData, selectedMethod: e.target.value })}
+                          className="h-4 w-4 text-blue-600"
+                        />
+                        <label htmlFor="upi" className="font-medium">UPI Payment</label>
+                      </div>
+                      
+                      {paymentData.selectedMethod === 'upi' && (
+                        <div className="ml-7">
+                          <Input
+                            placeholder="yourname@paytm"
+                            value={paymentData.upiId}
+                            onChange={(e) => setPaymentData({ ...paymentData, upiId: e.target.value })}
+                          />
+                          <div className="flex gap-2 mt-2">
+                            <Badge variant="outline">🟢 Google Pay</Badge>
+                            <Badge variant="outline">🟣 PhonePe</Badge>
+                            <Badge variant="outline">🔵 Paytm</Badge>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="radio"
+                          id="card"
+                          name="paymentMethod"
+                          value="card"
+                          checked={paymentData.selectedMethod === 'card'}
+                          onChange={(e) => setPaymentData({ ...paymentData, selectedMethod: e.target.value })}
+                          className="h-4 w-4 text-blue-600"
+                        />
+                        <label htmlFor="card" className="font-medium">Credit/Debit Card</label>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="radio"
+                          id="netbanking"
+                          name="paymentMethod"
+                          value="netbanking"
+                          checked={paymentData.selectedMethod === 'netbanking'}
+                          onChange={(e) => setPaymentData({ ...paymentData, selectedMethod: e.target.value })}
+                          className="h-4 w-4 text-blue-600"
+                        />
+                        <label htmlFor="netbanking" className="font-medium">Net Banking</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4">
+                    <Button variant="outline" onClick={() => setVerificationStep('input')} className="flex-1">
+                      <ArrowLeft className="mr-2 h-4 w-4" />
+                      Back
+                    </Button>
+                    <Button onClick={handlePayment} className="flex-1 bg-yellow-600 hover:bg-yellow-700">
+                      <CreditCard className="mr-2 h-4 w-4" />
+                      Pay ₹{amount}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Order Summary</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-green-600">₹{amount}</div>
+                      <p className="text-sm text-gray-600">Total Amount</p>
+                    </div>
+                    <Separator />
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Base verification</span>
+                        <span>₹75</span>
+                      </div>
+                      {formData.expressVerification && (
+                        <div className="flex justify-between">
+                          <span>Express processing</span>
+                          <span>₹75</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Verification Details</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div><strong>Document:</strong> {formData.documentType || 'Not specified'}</div>
+                  <div><strong>Purpose:</strong> {formData.purpose || 'Not specified'}</div>
+                  <div><strong>Processing:</strong> {formData.expressVerification ? 'Express (5 min)' : 'Standard (30 min)'}</div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (verificationStep === 'processing') {
     return (
@@ -447,8 +625,8 @@ const DocumentVerification = () => {
                   <label htmlFor="express" className="text-sm">Express verification (5 minutes) - ₹150</label>
                 </div>
 
-                <Button onClick={handleVerification} className="w-full bg-yellow-600 hover:bg-yellow-700">
-                  Start Verification - ₹{formData.expressVerification ? '150' : '75'}
+                <Button onClick={handleProceedToPayment} className="w-full bg-yellow-600 hover:bg-yellow-700">
+                  Proceed to Payment - ₹{formData.expressVerification ? '150' : '75'}
                 </Button>
               </CardContent>
             </Card>
