@@ -60,6 +60,10 @@ const OrganizationSignup = () => {
     setStep(4);
   };
 
+  const handleCompleteSignup = () => {
+    window.location.href = '/onboarding/organization';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50">
       {/* Header */}
@@ -70,7 +74,7 @@ const OrganizationSignup = () => {
               Kagzat
             </Link>
             <div className="text-sm text-gray-600">
-              Step {step + 1} of 5
+              Step {step} of 4
             </div>
           </div>
         </div>
@@ -339,13 +343,13 @@ const OrganizationSignup = () => {
                       <Check className="h-8 w-8 text-green-600" />
                     </div>
                     <h3 className="text-lg font-semibold text-green-600">Organization Account Created!</h3>
-                    <p className="text-gray-600">Your institution is ready to start validating documents</p>
+                    <p className="text-gray-600">Your institution is ready for detailed setup</p>
                   </div>
                   <Button
-                    onClick={() => console.log('Navigate to organization dashboard')}
+                    onClick={handleCompleteSignup}
                     className="w-full bg-kagzat-yellow hover:bg-yellow-500 text-kagzat-black font-semibold"
                   >
-                    Go to Organization Dashboard
+                    Continue to Organization Setup
                   </Button>
                 </div>
               )}
