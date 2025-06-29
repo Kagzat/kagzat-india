@@ -60,7 +60,7 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
       timeline: [
         { date: '2 hours ago', event: 'Request submitted', status: 'completed' },
         { date: '1 hour ago', event: 'Documents uploaded', status: 'completed' },
-        { date: '30 mins ago', element: 'Validator assigned', status: 'completed' },
+        { date: '30 mins ago', event: 'Validator assigned', status: 'completed' },
         { date: 'Now', event: 'Under review', status: 'current' }
       ]
     },
@@ -149,6 +149,11 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
     console.log('Additional info response:', additionalInfoResponse);
     setAdditionalInfoResponse('');
     // Here you would typically send the response to the backend
+  };
+
+  // Type guard to check if request has additionalInfoRequest
+  const hasAdditionalInfoRequest = (req: any): req is typeof request & { additionalInfoRequest: string } => {
+    return 'additionalInfoRequest' in req && typeof req.additionalInfoRequest === 'string';
   };
 
   return (
@@ -309,7 +314,7 @@ const RequestDetailsModal = ({ isOpen, onClose, requestId }: RequestDetailsModal
             </Card>
 
             {/* Additional Info Request (if applicable) */}
-            {request.additionalInfoRequest && (
+            {hasAdditionalInfoRequest(request) && (
               <Card className="border-orange-200 bg-orange-50">
                 <CardHeader>
                   <CardTitle className="text-lg flex items-center gap-2 text-orange-800">
