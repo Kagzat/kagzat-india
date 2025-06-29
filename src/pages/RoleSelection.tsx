@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { User, Badge, Building, ArrowRight, FileCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface RoleOption {
   id: string;
@@ -11,6 +11,7 @@ interface RoleOption {
   description: string;
   icon: React.ComponentType<{ className?: string }>;
   features: string[];
+  signupPath: string;
 }
 
 const roleOptions: RoleOption[] = [
@@ -24,7 +25,8 @@ const roleOptions: RoleOption[] = [
       'Submit validation requests',
       'Track validation status',
       'Access validation certificates'
-    ]
+    ],
+    signupPath: '/signup/user'
   },
   {
     id: 'validator',
@@ -36,7 +38,8 @@ const roleOptions: RoleOption[] = [
       'Set your own pricing',
       'Manage validation queue',
       'Earn from validations'
-    ]
+    ],
+    signupPath: '/signup/validator'
   },
   {
     id: 'organization',
@@ -48,21 +51,24 @@ const roleOptions: RoleOption[] = [
       'Manage team of validators',
       'Bulk validation processing',
       'Enterprise analytics'
-    ]
+    ],
+    signupPath: '/signup/organization'
   }
 ];
 
 const RoleSelection = () => {
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const handleRoleSelect = (roleId: string) => {
     setSelectedRole(roleId);
   };
 
   const handleContinue = () => {
-    // For now, just log the selected role
-    console.log('Selected role:', selectedRole);
-    // In a real app, this would navigate to the next step
+    const selectedRoleOption = roleOptions.find(role => role.id === selectedRole);
+    if (selectedRoleOption) {
+      navigate(selectedRoleOption.signupPath);
+    }
   };
 
   return (
