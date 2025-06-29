@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { 
@@ -482,7 +481,7 @@ const FormBuilder = () => {
                           {(provided) => (
                             <div ref={provided.innerRef} {...provided.droppableProps}>
                               <div className="space-y-1">
-                                {fields.slice(0, 5).map((field, index) => (
+                                {fields.map((field, index) => (
                                   <Draggable key={`${category}-${field.name}`} draggableId={field.name} index={index}>
                                     {(provided, snapshot) => (
                                       <div
@@ -501,11 +500,6 @@ const FormBuilder = () => {
                                     )}
                                   </Draggable>
                                 ))}
-                                {fields.length > 5 && (
-                                  <div className="text-xs text-gray-500 px-2">
-                                    +{fields.length - 5} more fields
-                                  </div>
-                                )}
                               </div>
                               {provided.placeholder}
                             </div>
