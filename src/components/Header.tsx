@@ -11,6 +11,7 @@ const Header = () => {
     { name: 'About', href: '#about' },
     { name: 'How it Works', href: '#how-it-works' },
     { name: 'Pricing', href: '#pricing' },
+    { name: 'Verify Document', href: '/document-verification' },
     { name: 'Sign In', href: '#signin' }
   ];
 
@@ -26,13 +27,23 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium"
-              >
-                {link.name}
-              </a>
+              link.href.startsWith('/') ? (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium"
+                >
+                  {link.name}
+                </Link>
+              ) : (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium"
+                >
+                  {link.name}
+                </a>
+              )
             ))}
             <Link to="/waitlist">
               <Button 
@@ -62,14 +73,25 @@ const Header = () => {
           <nav className="md:hidden mt-4 pb-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 mt-4">
               {navLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium py-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {link.name}
-                </a>
+                link.href.startsWith('/') ? (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </Link>
+                ) : (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </a>
+                )
               ))}
               <Link to="/waitlist">
                 <Button 
