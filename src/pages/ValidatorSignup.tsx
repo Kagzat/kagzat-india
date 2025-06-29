@@ -7,9 +7,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const ValidatorSignup = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1); // 1: Account, 2: Professional Info, 3: Phone, 4: Complete
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -333,13 +334,13 @@ const ValidatorSignup = () => {
                       <Check className="h-8 w-8 text-green-600" />
                     </div>
                     <h3 className="text-lg font-semibold text-green-600">Account Created Successfully!</h3>
-                    <p className="text-gray-600">You're ready to start validating documents</p>
+                    <p className="text-gray-600">Let's complete your professional profile</p>
                   </div>
                   <Button
-                    onClick={() => console.log('Navigate to validator dashboard')}
+                    onClick={() => navigate('/onboarding/validator')}
                     className="w-full bg-kagzat-yellow hover:bg-yellow-500 text-kagzat-black font-semibold"
                   >
-                    Go to Validator Dashboard
+                    Complete Profile Setup
                   </Button>
                 </div>
               )}
