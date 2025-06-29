@@ -1,4 +1,3 @@
-
 export const formFieldLibrary = {
   "Identity": [
     { "name": "first_name", "min_length": 1, "max_length": 50 },
@@ -88,7 +87,7 @@ export const formFieldLibrary = {
 export const documentLibrary = {
   "Identity": [
     "passport",
-    "national_id_card",
+    "national_id_card", 
     "driving_license",
     "social_security_card",
     "aadhaar_card",
@@ -109,7 +108,7 @@ export const documentLibrary = {
   "Education": [
     "school_marksheet",
     "university_marksheet",
-    "diploma_certificate",
+    "diploma_certificate", 
     "degree_certificate",
     "transcript",
     "student_id_card",

@@ -1,4 +1,3 @@
-
 import { useState, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { 
@@ -86,11 +85,13 @@ const FormBuilder = () => {
     },
     {
       id: '4',
-      type: 'document-upload',
-      label: 'Identity Verification',
+      type: 'document-link',
+      label: 'Passport - Google Drive Link',
       required: true,
-      documentTypes: ['passport', 'national_id_card', 'driving_license'],
-      helpText: 'Upload any government-issued ID document'
+      documentTypes: ['passport'],
+      category: 'Identity',
+      placeholder: 'Paste your Google Drive share link here',
+      helpText: 'Please share a Google Drive link to your passport'
     }
   ]);
 
@@ -148,17 +149,18 @@ const FormBuilder = () => {
         setFormElements(newElements);
       }
     } else if (result.source.droppableId.startsWith('document-') && result.destination.droppableId === 'canvas') {
-      // Adding document upload from library
-      const category = result.source.droppableId.replace('document-', '');
-      const documents = documentLibrary[category as keyof typeof documentLibrary];
+      // Adding individual document from library
+      const [, category, documentType] = result.source.droppableId.split('-', 3);
       
       const newElement: FormElement = {
         id: Date.now().toString(),
-        type: 'document-upload',
-        label: `${category} Document Upload`,
+        type: 'document-link',
+        label: `${formatDocumentName(documentType)} - Google Drive Link`,
         required: true,
-        documentTypes: documents,
-        helpText: `Upload any of the following: ${documents.map(doc => formatDocumentName(doc)).join(', ')}`
+        documentTypes: [documentType],
+        category,
+        placeholder: 'Paste your Google Drive share link here',
+        helpText: `Please share a Google Drive link to your ${formatDocumentName(documentType).toLowerCase()}`
       };
 
       const newElements = [...formElements];
@@ -208,6 +210,25 @@ const FormBuilder = () => {
                   {element.minLength}-{element.maxLength} characters
                 </p>
               )}
+            </div>
+          );
+        case 'document-link':
+          return (
+            <div>
+              <Label className="flex items-center gap-2">
+                {element.label} 
+                {element.required && <span className="text-red-500">*</span>}
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">{element.category}</span>
+              </Label>
+              <Input 
+                type="url"
+                placeholder={element.placeholder}
+                className="mt-1"
+              />
+              {element.helpText && <p className="text-sm text-gray-500 mt-1">{element.helpText}</p>}
+              <p className="text-xs text-gray-400 mt-1">
+                Make sure the link has sharing permissions enabled
+              </p>
             </div>
           );
         case 'document-upload':
@@ -496,33 +517,41 @@ const FormBuilder = () => {
                   <div className="space-y-4">
                     {Object.entries(documentLibrary).map(([category, documents]) => (
                       <div key={category}>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                          <Link className="h-4 w-4" />
+                          {category} Documents
+                        </h4>
                         <Droppable droppableId={`document-${category}`} isDropDisabled={true}>
                           {(provided) => (
                             <div ref={provided.innerRef} {...provided.droppableProps}>
-                              <Draggable key={category} draggableId={category} index={0}>
-                                {(provided, snapshot) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                    className={`p-3 rounded border cursor-grab transition-all ${
-                                      snapshot.isDragging ? 'bg-green-100 border-green-300' : 'bg-green-50 hover:bg-green-100 border-green-200'
-                                    }`}
-                                  >
-                                    <div className="flex items-center gap-2 mb-2">
-                                      <Upload className="h-4 w-4 text-green-600" />
-                                      <span className="font-medium text-green-800">{category} Documents</span>
-                                    </div>
-                                    <div className="text-xs text-green-600">
-                                      {documents.length} document types
-                                    </div>
-                                    <div className="text-xs text-gray-500 mt-1">
-                                      {documents.slice(0, 2).map(doc => formatDocumentName(doc)).join(', ')}
-                                      {documents.length > 2 && '...'}
-                                    </div>
-                                  </div>
-                                )}
-                              </Draggable>
+                              <div className="space-y-1">
+                                {documents.map((document, index) => (
+                                  <Draggable key={document} draggableId={document} index={index}>
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`p-2 rounded border text-sm cursor-grab transition-all ${
+                                          snapshot.isDragging ? 'bg-green-100 border-green-300' : 'bg-green-50 hover:bg-green-100 border-green-200'
+                                        }`}
+                                      >
+                                        <div className="flex items-center gap-2">
+                                          <Link className="h-3 w-3 text-green-600" />
+                                          <div>
+                                            <div className="font-medium text-green-800">
+                                              {formatDocumentName(document)}
+                                            </div>
+                                            <div className="text-xs text-green-600">
+                                              Google Drive Link
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                              </div>
                               {provided.placeholder}
                             </div>
                           )}
@@ -638,16 +667,22 @@ const FormBuilder = () => {
                         </>
                       )}
                       
-                      {selectedElementData.type === 'document-upload' && (
+                      {(selectedElementData.type === 'document-upload' || selectedElementData.type === 'document-link') && (
                         <div>
-                          <Label>Accepted Documents</Label>
-                          <div className="mt-2 space-y-1">
-                            {selectedElementData.documentTypes?.map((docType, index) => (
-                              <div key={index} className="text-sm bg-gray-100 px-2 py-1 rounded">
-                                {formatDocumentName(docType)}
+                          <Label>Document Category</Label>
+                          <Input
+                            value={selectedElementData.category || ''}
+                            disabled
+                            className="mt-1 bg-gray-50"
+                          />
+                          {selectedElementData.documentTypes && (
+                            <div className="mt-2">
+                              <Label className="text-sm">Document Type</Label>
+                              <div className="mt-1 text-sm bg-gray-100 px-2 py-1 rounded">
+                                {selectedElementData.documentTypes.map(doc => formatDocumentName(doc)).join(', ')}
                               </div>
-                            ))}
-                          </div>
+                            </div>
+                          )}
                         </div>
                       )}
                       
