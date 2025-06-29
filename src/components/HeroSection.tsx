@@ -20,11 +20,11 @@ const HeroSection = () => {
             </p>
 
             <div className="flex justify-center lg:justify-start">
-              <Link to="/role-selection">
+              <Link to="/waitlist">
                 <Button 
-                  className="bg-kagzat-green hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
+                  className="bg-kagzat-yellow hover:bg-yellow-500 text-kagzat-black font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
                 >
-                  Join the Revolution
+                  Join Waitlist
                   <ArrowRight className="h-5 w-5" />
                 </Button>
               </Link>
