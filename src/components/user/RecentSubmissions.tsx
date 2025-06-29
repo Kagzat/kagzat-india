@@ -1,4 +1,3 @@
-
 import { CheckCircle, Download, Star, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -40,55 +39,55 @@ const RecentSubmissions = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <span>Recent Submissions</span>
+          <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+          <span className="truncate">Recent Submissions</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {recentSubmissions.map((submission) => (
             <div key={submission.id} className="border rounded-lg p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-xs font-mono text-gray-500">{submission.id}</span>
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-3 space-y-3 lg:space-y-0">
+                <div className="flex-1 min-w-0 lg:pr-4">
+                  <div className="flex items-center space-x-2 mb-2 flex-wrap">
+                    <span className="text-xs font-mono text-gray-500 break-all">{submission.id}</span>
                     <Badge 
                       variant="outline" 
-                      className={submission.status === 'Verified' 
+                      className={`flex-shrink-0 ${submission.status === 'Verified' 
                         ? 'bg-green-100 text-green-800 border-green-300' 
                         : 'bg-red-100 text-red-800 border-red-300'
-                      }
+                      }`}
                     >
                       {submission.status}
                     </Badge>
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-1">{submission.document}</h4>
-                  <p className="text-sm text-gray-600 mb-2">Validator: {submission.validator}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span>Completed {submission.completedDate}</span>
-                    <span>₹{submission.fee.toLocaleString()}</span>
+                  <h4 className="font-semibold text-gray-900 mb-1 break-words">{submission.document}</h4>
+                  <p className="text-sm text-gray-600 mb-2 break-words">Validator: {submission.validator}</p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                    <span className="flex-shrink-0">Completed {submission.completedDate}</span>
+                    <span className="flex-shrink-0">₹{submission.fee.toLocaleString()}</span>
                     {submission.rating && (
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-1 flex-shrink-0">
                         <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                         <span>{submission.rating}</span>
                       </div>
                     )}
                   </div>
                   {submission.status === 'Rejected' && submission.rejectionReason && (
-                    <p className="text-sm text-red-600 mt-2">
+                    <p className="text-sm text-red-600 mt-2 break-words">
                       Reason: {submission.rejectionReason}
                     </p>
                   )}
                 </div>
-                <div className="flex flex-col space-y-2">
+                <div className="flex flex-col space-y-2 w-full lg:w-auto">
                   {submission.status === 'Verified' && (
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="w-full lg:w-auto">
                       <Download className="h-4 w-4 mr-2" />
                       Download
                     </Button>
                   )}
                   {submission.status === 'Rejected' && (
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline" size="sm" className="w-full lg:w-auto">
                       <RefreshCw className="h-4 w-4 mr-2" />
                       Resubmit
                     </Button>

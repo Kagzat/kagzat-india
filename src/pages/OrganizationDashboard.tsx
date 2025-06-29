@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Building, Users, FileCheck, TrendingUp, Search, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -49,25 +48,25 @@ const OrganizationDashboard = () => {
     <div className="min-h-screen bg-gray-50 flex">
       <OrganizationSidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
       
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'} min-w-0`}>
         {/* Header Section */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">TechCorp Solutions</h1>
+        <div className="bg-white border-b border-gray-200 px-4 lg:px-6 py-4">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
+            <div className="min-w-0">
+              <h1 className="text-xl lg:text-2xl font-bold text-gray-900 truncate">TechCorp Solutions</h1>
               <Badge variant="secondary" className="mt-1 bg-purple-100 text-purple-800">
                 Enterprise Account
               </Badge>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input 
                   placeholder="Search employees, requests..." 
-                  className="pl-10 w-80"
+                  className="pl-10 w-full sm:w-80"
                 />
               </div>
-              <Button>
+              <Button className="w-full sm:w-auto flex-shrink-0">
                 <Plus className="h-4 w-4 mr-2" />
                 Bulk Upload
               </Button>
@@ -76,20 +75,20 @@ const OrganizationDashboard = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="p-4 lg:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
             {quickStats.map((stat, index) => {
               const Icon = stat.icon;
               return (
                 <Card key={index} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 lg:p-6">
                     <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-600">{stat.title}</p>
-                        <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-gray-600 truncate">{stat.title}</p>
+                        <p className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
                       </div>
-                      <div className={`p-3 rounded-full ${stat.bgColor}`}>
-                        <Icon className={`h-6 w-6 ${stat.color}`} />
+                      <div className={`p-3 rounded-full ${stat.bgColor} flex-shrink-0`}>
+                        <Icon className={`h-5 w-5 lg:h-6 lg:w-6 ${stat.color}`} />
                       </div>
                     </div>
                   </CardContent>
@@ -99,9 +98,9 @@ const OrganizationDashboard = () => {
           </div>
 
           {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
             {/* Left Column - Team Requests */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="xl:col-span-2 space-y-6">
               <TeamRequests />
               <ValidationMetrics />
             </div>

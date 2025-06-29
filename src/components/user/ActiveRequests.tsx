@@ -1,4 +1,3 @@
-
 import { Clock, AlertTriangle, CheckCircle, Eye } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -55,33 +54,33 @@ const ActiveRequests = () => {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Clock className="h-5 w-5" />
-          <span>Active Verification Requests ({activeRequests.length})</span>
+          <Clock className="h-5 w-5 flex-shrink-0" />
+          <span className="truncate">Active Verification Requests ({activeRequests.length})</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {activeRequests.map((request) => (
             <div key={request.id} className="border rounded-lg p-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-xs font-mono text-gray-500">{request.id}</span>
+              <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-3 space-y-3 lg:space-y-0">
+                <div className="flex-1 min-w-0 lg:pr-4">
+                  <div className="flex items-center space-x-2 mb-2 flex-wrap">
+                    <span className="text-xs font-mono text-gray-500 break-all">{request.id}</span>
                     {request.priority === 'express' && (
-                      <Badge variant="destructive" className="text-xs">
+                      <Badge variant="destructive" className="text-xs flex-shrink-0">
                         <AlertTriangle className="h-3 w-3 mr-1" />
                         Express
                       </Badge>
                     )}
                   </div>
-                  <h4 className="font-semibold text-gray-900 mb-1">{request.document}</h4>
-                  <p className="text-sm text-gray-600 mb-2">Validator: {request.validator}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <span>Submitted {request.submittedDate}</span>
-                    <span>₹{request.fee.toLocaleString()}</span>
+                  <h4 className="font-semibold text-gray-900 mb-1 break-words">{request.document}</h4>
+                  <p className="text-sm text-gray-600 mb-2 break-words">Validator: {request.validator}</p>
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                    <span className="flex-shrink-0">Submitted {request.submittedDate}</span>
+                    <span className="flex-shrink-0">₹{request.fee.toLocaleString()}</span>
                   </div>
                 </div>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="flex-shrink-0 w-full lg:w-auto">
                   <Eye className="h-4 w-4 mr-2" />
                   View Details
                 </Button>
@@ -89,13 +88,13 @@ const ActiveRequests = () => {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Badge variant="outline" className={getStatusColor(request.status)}>
+                  <Badge variant="outline" className={`${getStatusColor(request.status)} flex-shrink-0`}>
                     {request.status}
                   </Badge>
-                  <span className="text-sm text-gray-600">{request.progress}% complete</span>
+                  <span className="text-sm text-gray-600 flex-shrink-0">{request.progress}% complete</span>
                 </div>
                 <Progress value={request.progress} className="h-2" />
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 break-words">
                   Expected completion: {request.estimatedCompletion}
                 </p>
               </div>

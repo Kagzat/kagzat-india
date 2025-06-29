@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { FileText, Upload, Trash2, Download, Eye, Shield, Clock, CheckCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -146,166 +145,168 @@ const DocumentLibrary = () => {
   };
 
   return (
-    <Card>
+    <Card className="h-fit">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <FileText className="h-5 w-5" />
-            <span>Document Library</span>
+            <FileText className="h-5 w-5 flex-shrink-0" />
+            <span className="truncate">Document Library</span>
           </div>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" className="flex-shrink-0">
             <Upload className="h-4 w-4 mr-2" />
             Upload
           </Button>
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4">
         <div className="space-y-3">
           {documents.map((doc, index) => (
-            <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-              <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-1">
-                  <h4 className="font-medium text-gray-900 text-sm">{doc.name}</h4>
-                  <Badge variant="outline" className={`text-xs ${getTypeColor(doc.type)}`}>
+            <div key={index} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 min-w-0">
+              <div className="flex-1 min-w-0 pr-3">
+                <div className="flex items-center space-x-2 mb-1 flex-wrap">
+                  <h4 className="font-medium text-gray-900 text-sm truncate min-w-0">{doc.name}</h4>
+                  <Badge variant="outline" className={`text-xs flex-shrink-0 ${getTypeColor(doc.type)}`}>
                     {doc.type}
                   </Badge>
                   {doc.validationTrail.length > 1 && (
-                    <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800 border-yellow-300">
+                    <Badge variant="outline" className="text-xs bg-yellow-100 text-yellow-800 border-yellow-300 flex-shrink-0">
                       {doc.validationTrail.length} validations
                     </Badge>
                   )}
                 </div>
-                <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span>{doc.size}</span>
-                  <span>Added {doc.uploadDate}</span>
-                  <span>Used {doc.used} times</span>
+                <div className="flex items-center space-x-4 text-xs text-gray-500 flex-wrap">
+                  <span className="flex-shrink-0">{doc.size}</span>
+                  <span className="flex-shrink-0">Added {doc.uploadDate}</span>
+                  <span className="flex-shrink-0">Used {doc.used} times</span>
                 </div>
               </div>
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-1 flex-shrink-0">
                 <Dialog>
                   <DialogTrigger asChild>
                     <Button variant="ghost" size="sm" onClick={() => setSelectedDocument(doc)}>
                       <Eye className="h-4 w-4" />
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5" />
-                        <span>{selectedDocument?.name}</span>
+                  <DialogContent className="max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+                    <DialogHeader className="flex-shrink-0">
+                      <DialogTitle className="flex items-center space-x-2 pr-8">
+                        <FileText className="h-5 w-5 flex-shrink-0" />
+                        <span className="truncate">{selectedDocument?.name}</span>
                       </DialogTitle>
                     </DialogHeader>
                     
-                    {selectedDocument && (
-                      <div className="space-y-6">
-                        {/* Document Info */}
-                        <div className="bg-gray-50 p-4 rounded-lg">
-                          <h3 className="font-semibold text-gray-900 mb-2">Document Information</h3>
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-600">Type</p>
-                              <Badge variant="outline" className={`text-xs ${getTypeColor(selectedDocument.type)}`}>
-                                {selectedDocument.type}
-                              </Badge>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Size</p>
-                              <p className="text-sm font-medium">{selectedDocument.size}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Upload Date</p>
-                              <p className="text-sm font-medium">{selectedDocument.uploadDate}</p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-600">Total Validations</p>
-                              <p className="text-sm font-medium">{selectedDocument.validationTrail.length}</p>
+                    <div className="flex-1 overflow-y-auto">
+                      {selectedDocument && (
+                        <div className="space-y-6 pr-2">
+                          {/* Document Info */}
+                          <div className="bg-gray-50 p-4 rounded-lg">
+                            <h3 className="font-semibold text-gray-900 mb-3">Document Information</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-sm text-gray-600 mb-1">Type</p>
+                                <Badge variant="outline" className={`text-xs ${getTypeColor(selectedDocument.type)}`}>
+                                  {selectedDocument.type}
+                                </Badge>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600 mb-1">Size</p>
+                                <p className="text-sm font-medium">{selectedDocument.size}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600 mb-1">Upload Date</p>
+                                <p className="text-sm font-medium">{selectedDocument.uploadDate}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-600 mb-1">Total Validations</p>
+                                <p className="text-sm font-medium">{selectedDocument.validationTrail.length}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        {/* Validation Trail */}
-                        <div>
-                          <h3 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-                            <Clock className="h-5 w-5" />
-                            <span>Validation Trail</span>
-                          </h3>
-                          
-                          <div className="space-y-4">
-                            {selectedDocument.validationTrail.map((validation: any, idx: number) => (
-                              <div key={validation.id} className="border rounded-lg p-4 bg-white">
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="flex-1">
-                                    <div className="flex items-center space-x-2 mb-2">
-                                      {getValidatorTypeIcon(validation.validatorType)}
-                                      <h4 className="font-semibold text-gray-900">{validation.validator}</h4>
-                                      <Badge variant="outline" className={`text-xs ${getValidatorTypeColor(validation.validatorType)}`}>
-                                        {validation.validatorBadge}
-                                      </Badge>
+                          {/* Validation Trail */}
+                          <div>
+                            <h3 className="font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                              <Clock className="h-5 w-5 flex-shrink-0" />
+                              <span>Validation Trail</span>
+                            </h3>
+                            
+                            <div className="space-y-4">
+                              {selectedDocument.validationTrail.map((validation: any, idx: number) => (
+                                <div key={validation.id} className="border rounded-lg p-4 bg-white">
+                                  <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-3 space-y-3 lg:space-y-0">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center space-x-2 mb-2 flex-wrap">
+                                        {getValidatorTypeIcon(validation.validatorType)}
+                                        <h4 className="font-semibold text-gray-900 truncate">{validation.validator}</h4>
+                                        <Badge variant="outline" className={`text-xs flex-shrink-0 ${getValidatorTypeColor(validation.validatorType)}`}>
+                                          {validation.validatorBadge}
+                                        </Badge>
+                                      </div>
+                                      
+                                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                                        <div>
+                                          <p className="text-gray-600 mb-1">Validation ID</p>
+                                          <p className="font-mono text-gray-900 text-xs break-all">{validation.id}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-gray-600 mb-1">Date</p>
+                                          <p className="text-gray-900">{new Date(validation.date).toLocaleDateString()}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-gray-600 mb-1">Purpose</p>
+                                          <p className="text-gray-900 break-words">{validation.purpose}</p>
+                                        </div>
+                                        <div>
+                                          <p className="text-gray-600 mb-1">Fee Paid</p>
+                                          <p className="text-gray-900">₹{validation.fee.toLocaleString()}</p>
+                                        </div>
+                                      </div>
                                     </div>
                                     
-                                    <div className="grid grid-cols-2 gap-4 text-sm">
-                                      <div>
-                                        <p className="text-gray-600">Validation ID</p>
-                                        <p className="font-mono text-gray-900">{validation.id}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-gray-600">Date</p>
-                                        <p className="text-gray-900">{new Date(validation.date).toLocaleDateString()}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-gray-600">Purpose</p>
-                                        <p className="text-gray-900">{validation.purpose}</p>
-                                      </div>
-                                      <div>
-                                        <p className="text-gray-600">Fee Paid</p>
-                                        <p className="text-gray-900">₹{validation.fee.toLocaleString()}</p>
+                                    <div className="flex flex-row lg:flex-col items-start lg:items-end space-x-2 lg:space-x-0 lg:space-y-2 flex-shrink-0">
+                                      <Badge className="bg-green-100 text-green-800 border-green-300 flex-shrink-0">
+                                        <CheckCircle className="h-3 w-3 mr-1" />
+                                        {validation.status}
+                                      </Badge>
+                                      <div className="flex items-center space-x-1 text-sm text-gray-600 flex-shrink-0">
+                                        <span>⭐ {validation.validatorRating}</span>
                                       </div>
                                     </div>
                                   </div>
                                   
-                                  <div className="flex flex-col items-end space-y-2">
-                                    <Badge className="bg-green-100 text-green-800 border-green-300">
-                                      <CheckCircle className="h-3 w-3 mr-1" />
-                                      {validation.status}
-                                    </Badge>
-                                    <div className="flex items-center space-x-1 text-sm text-gray-600">
-                                      <span>⭐ {validation.validatorRating}</span>
-                                    </div>
-                                  </div>
+                                  {idx < selectedDocument.validationTrail.length - 1 && (
+                                    <div className="border-l-2 border-gray-200 ml-2 h-4"></div>
+                                  )}
                                 </div>
-                                
-                                {idx < selectedDocument.validationTrail.length - 1 && (
-                                  <div className="border-l-2 border-gray-200 ml-2 h-4"></div>
-                                )}
-                              </div>
-                            ))}
+                              ))}
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Summary Stats */}
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <h4 className="font-semibold text-blue-900 mb-2">Validation Summary</h4>
-                          <div className="grid grid-cols-3 gap-4 text-sm">
-                            <div>
-                              <p className="text-blue-700">Total Spent</p>
-                              <p className="font-bold text-blue-900">
-                                ₹{selectedDocument.validationTrail.reduce((sum: number, v: any) => sum + v.fee, 0).toLocaleString()}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-blue-700">Average Rating</p>
-                              <p className="font-bold text-blue-900">
-                                {(selectedDocument.validationTrail.reduce((sum: number, v: any) => sum + v.validatorRating, 0) / selectedDocument.validationTrail.length).toFixed(1)} ⭐
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-blue-700">Success Rate</p>
-                              <p className="font-bold text-blue-900">100%</p>
+                          {/* Summary Stats */}
+                          <div className="bg-blue-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-blue-900 mb-3">Validation Summary</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                              <div>
+                                <p className="text-blue-700 mb-1">Total Spent</p>
+                                <p className="font-bold text-blue-900 break-words">
+                                  ₹{selectedDocument.validationTrail.reduce((sum: number, v: any) => sum + v.fee, 0).toLocaleString()}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-blue-700 mb-1">Average Rating</p>
+                                <p className="font-bold text-blue-900">
+                                  {(selectedDocument.validationTrail.reduce((sum: number, v: any) => sum + v.validatorRating, 0) / selectedDocument.validationTrail.length).toFixed(1)} ⭐
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-blue-700 mb-1">Success Rate</p>
+                                <p className="font-bold text-blue-900">100%</p>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </DialogContent>
                 </Dialog>
                 
