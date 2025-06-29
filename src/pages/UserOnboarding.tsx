@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Save, Check, Upload, FileText, Calendar, Globe, MapPin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Check, Link as LinkIcon, FileText, Calendar, Globe, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -28,11 +27,11 @@ interface UserData {
   country: string;
   postalCode: string;
   documentCategories: string[];
-  uploadedDocuments: Array<{
+  documentLinks: Array<{
     category: string;
     type: string;
+    url: string;
     filename: string;
-    source: string;
   }>;
   emailNotifications: boolean;
   smsNotifications: boolean;
@@ -98,10 +97,10 @@ const UserOnboarding = () => {
     country: '',
     postalCode: '',
     documentCategories: [],
-    uploadedDocuments: [
-      { category: 'identity', type: 'Passport', filename: 'Passport.pdf', source: 'Google Drive' },
-      { category: 'educational', type: 'Degree Certificate', filename: 'MBA_Certificate.pdf', source: 'Google Drive' },
-      { category: 'work', type: 'Experience Certificate', filename: 'Experience_Letter.pdf', source: 'Google Drive' }
+    documentLinks: [
+      { category: 'identity', type: 'Passport', url: 'https://drive.google.com/file/d/1abc...', filename: 'Passport.pdf' },
+      { category: 'educational', type: 'Degree Certificate', url: 'https://drive.google.com/file/d/2def...', filename: 'MBA_Certificate.pdf' },
+      { category: 'work', type: 'Experience Certificate', url: 'https://drive.google.com/file/d/3ghi...', filename: 'Experience_Letter.pdf' }
     ],
     emailNotifications: true,
     smsNotifications: false,
@@ -109,6 +108,9 @@ const UserOnboarding = () => {
     preferredValidators: '',
     expressValidation: false
   });
+  const [newDocumentUrl, setNewDocumentUrl] = useState('');
+  const [selectedDocumentType, setSelectedDocumentType] = useState('');
+  const [addingToCategory, setAddingToCategory] = useState('');
   const navigate = useNavigate();
 
   // Auto-save functionality
@@ -145,6 +147,29 @@ const UserOnboarding = () => {
         ? prev.documentCategories.filter(id => id !== categoryId)
         : [...prev.documentCategories, categoryId]
     }));
+  };
+
+  const handleAddDocument = (categoryId: string) => {
+    if (!newDocumentUrl || !selectedDocumentType) return;
+    
+    // Extract filename from URL or use document type as default
+    const filename = newDocumentUrl.includes('/') 
+      ? newDocumentUrl.split('/').pop()?.split('?')[0] || selectedDocumentType 
+      : selectedDocumentType;
+    
+    setUserData(prev => ({
+      ...prev,
+      documentLinks: [...prev.documentLinks, {
+        category: categoryId,
+        type: selectedDocumentType,
+        url: newDocumentUrl,
+        filename: filename + '.pdf'
+      }]
+    }));
+    
+    setNewDocumentUrl('');
+    setSelectedDocumentType('');
+    setAddingToCategory('');
   };
 
   const renderStep1 = () => (
@@ -351,15 +376,15 @@ const UserOnboarding = () => {
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Upload Your Documents</h2>
-        <p className="text-gray-600">Add documents from your selected categories</p>
+        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Share Your Document Links</h2>
+        <p className="text-gray-600">Provide Google Drive links for your documents</p>
       </div>
 
       {userData.documentCategories.map((categoryId) => {
         const category = documentCategories.find(cat => cat.id === categoryId);
         if (!category) return null;
 
-        const categoryDocs = userData.uploadedDocuments.filter(doc => doc.category === categoryId);
+        const categoryDocs = userData.documentLinks.filter(doc => doc.category === categoryId);
 
         return (
           <Card key={categoryId} className="border-gray-200">
@@ -374,31 +399,76 @@ const UserOnboarding = () => {
                 <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <div className="h-10 w-10 bg-kagzat-green/10 rounded-lg flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-kagzat-green" />
+                      <LinkIcon className="h-5 w-5 text-kagzat-green" />
                     </div>
                     <div>
                       <p className="font-medium text-kagzat-black">{doc.filename}</p>
-                      <p className="text-sm text-gray-600">Uploaded via {doc.source}</p>
+                      <p className="text-sm text-gray-600">Google Drive Link</p>
                     </div>
                   </div>
                   <Badge className="bg-green-100 text-green-700">
                     <Check className="h-3 w-3 mr-1" />
-                    Uploaded
+                    Linked
                   </Badge>
                 </div>
               ))}
               
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4">Add more {category.title.toLowerCase()}</p>
-                <Button variant="outline" className="mb-2">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Upload from Device
-                </Button>
-                <Button variant="outline" className="ml-2">
-                  Link Google Drive
-                </Button>
-              </div>
+              {addingToCategory === categoryId ? (
+                <div className="border-2 border-dashed border-kagzat-green rounded-lg p-4 space-y-3">
+                  <div>
+                    <Label>Document Type</Label>
+                    <Select value={selectedDocumentType} onValueChange={setSelectedDocumentType}>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select document type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {category.types.map(type => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Google Drive Link</Label>
+                    <Input
+                      value={newDocumentUrl}
+                      onChange={(e) => setNewDocumentUrl(e.target.value)}
+                      placeholder="https://drive.google.com/file/d/..."
+                      className="mt-1"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button 
+                      onClick={() => handleAddDocument(categoryId)}
+                      disabled={!newDocumentUrl || !selectedDocumentType}
+                      className="bg-kagzat-green hover:bg-green-600 text-white"
+                    >
+                      <LinkIcon className="h-4 w-4 mr-2" />
+                      Add Document
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setAddingToCategory('')}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <LinkIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-gray-600 mb-4">Add more {category.title.toLowerCase()}</p>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setAddingToCategory(categoryId)}
+                  >
+                    <LinkIcon className="h-4 w-4 mr-2" />
+                    Share Google Drive Link
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
         );
@@ -503,7 +573,7 @@ const UserOnboarding = () => {
         <CardContent className="space-y-3">
           <div className="flex justify-between">
             <span className="text-gray-600">Documents Uploaded:</span>
-            <span className="font-medium">{userData.uploadedDocuments.length}</span>
+            <span className="font-medium">{userData.documentLinks.length}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Categories Selected:</span>
@@ -537,7 +607,7 @@ const UserOnboarding = () => {
             </Link>
             {step < 5 && (
               <div className="text-sm text-gray-600">
-                Step {step} of 4 - {step === 1 ? 'Personal Details' : step === 2 ? 'Document Categories' : step === 3 ? 'Document Upload' : 'Preferences'}
+                Step {step} of 4 - {step === 1 ? 'Personal Details' : step === 2 ? 'Document Categories' : step === 3 ? 'Document Links' : 'Preferences'}
               </div>
             )}
           </div>
