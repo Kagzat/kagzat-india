@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,6 +16,7 @@ import FormBuilder from "./pages/FormBuilder";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import AutoFillDemo from "./pages/AutoFillDemo";
+import DocumentVerification from "./pages/DocumentVerification";
 import ValidatorDashboard from "./pages/ValidatorDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import OrganizationDashboard from "./pages/OrganizationDashboard";
@@ -42,6 +42,7 @@ const App = () => (
           <Route path="/form-builder" element={<FormBuilder />} />
           <Route path="/search" element={<Search />} />
           <Route path="/autofill-demo" element={<AutoFillDemo />} />
+          <Route path="/document-verification" element={<DocumentVerification />} />
           <Route path="/validator-dashboard" element={<ValidatorDashboard />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/organization-dashboard" element={<OrganizationDashboard />} />
