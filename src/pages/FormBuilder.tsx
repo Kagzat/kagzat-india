@@ -1,3 +1,4 @@
+
 import { useState, useRef } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { 
@@ -128,7 +129,8 @@ const FormBuilder = () => {
       setFormElements(newElements);
     } else if (result.source.droppableId.startsWith('predefined-') && result.destination.droppableId === 'canvas') {
       // Adding predefined field from library
-      const [, category, fieldName] = result.source.droppableId.split('-');
+      const category = result.source.droppableId.replace('predefined-', '');
+      const fieldName = result.draggableId;
       const field = formFieldLibrary[category as keyof typeof formFieldLibrary].find(f => f.name === fieldName);
       
       if (field) {
@@ -150,7 +152,8 @@ const FormBuilder = () => {
       }
     } else if (result.source.droppableId.startsWith('document-') && result.destination.droppableId === 'canvas') {
       // Adding individual document from library
-      const [, category, documentType] = result.source.droppableId.split('-', 3);
+      const category = result.source.droppableId.replace('document-', '');
+      const documentType = result.draggableId;
       
       const newElement: FormElement = {
         id: Date.now().toString(),
@@ -480,7 +483,7 @@ const FormBuilder = () => {
                             <div ref={provided.innerRef} {...provided.droppableProps}>
                               <div className="space-y-1">
                                 {fields.slice(0, 5).map((field, index) => (
-                                  <Draggable key={field.name} draggableId={field.name} index={index}>
+                                  <Draggable key={`${category}-${field.name}`} draggableId={field.name} index={index}>
                                     {(provided, snapshot) => (
                                       <div
                                         ref={provided.innerRef}
@@ -526,7 +529,7 @@ const FormBuilder = () => {
                             <div ref={provided.innerRef} {...provided.droppableProps}>
                               <div className="space-y-1">
                                 {documents.map((document, index) => (
-                                  <Draggable key={document} draggableId={document} index={index}>
+                                  <Draggable key={`${category}-${document}`} draggableId={document} index={index}>
                                     {(provided, snapshot) => (
                                       <div
                                         ref={provided.innerRef}
