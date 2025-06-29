@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +17,7 @@ import FormBuilder from "./pages/FormBuilder";
 import Search from "./pages/Search";
 import NotFound from "./pages/NotFound";
 import AutoFillDemo from "./pages/AutoFillDemo";
+import ValidatorDashboard from "./pages/ValidatorDashboard";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,7 @@ const App = () => (
           <Route path="/form-builder" element={<FormBuilder />} />
           <Route path="/search" element={<Search />} />
           <Route path="/autofill-demo" element={<AutoFillDemo />} />
+          <Route path="/validator-dashboard" element={<ValidatorDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
