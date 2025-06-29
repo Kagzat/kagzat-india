@@ -7,12 +7,27 @@ import { Link } from 'react-router-dom';
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
+    setIsMenuOpen(false);
+  };
+
   const navLinks = [
-    { name: 'About', href: '#about' },
-    { name: 'How it Works', href: '#how-it-works' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'Verify Document', href: '/document-verification' },
-    { name: 'Sign In', href: '/signin' }
+    { name: 'About', href: '#about', isSection: true },
+    { name: 'How it Works', href: '#how-it-works', isSection: true },
+    { name: 'Pricing', href: '#pricing', isSection: true },
+    { name: 'Verify Document', href: '/document-verification', isSection: false, openNewTab: true },
+    { name: 'Sign In', href: '/signin', isSection: false }
   ];
 
   return (
@@ -27,7 +42,25 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              link.href.startsWith('/') ? (
+              link.isSection ? (
+                <button
+                  key={link.name}
+                  onClick={() => scrollToSection(link.href.substring(1))}
+                  className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium cursor-pointer"
+                >
+                  {link.name}
+                </button>
+              ) : link.openNewTab ? (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium"
+                >
+                  {link.name}
+                </a>
+              ) : (
                 <Link
                   key={link.name}
                   to={link.href}
@@ -35,14 +68,6 @@ const Header = () => {
                 >
                   {link.name}
                 </Link>
-              ) : (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium"
-                >
-                  {link.name}
-                </a>
               )
             ))}
             <Link to="/role-selection">
@@ -73,7 +98,26 @@ const Header = () => {
           <nav className="md:hidden mt-4 pb-4 border-t border-gray-200">
             <div className="flex flex-col space-y-4 mt-4">
               {navLinks.map((link) => (
-                link.href.startsWith('/') ? (
+                link.isSection ? (
+                  <button
+                    key={link.name}
+                    onClick={() => scrollToSection(link.href.substring(1))}
+                    className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium py-2 text-left"
+                  >
+                    {link.name}
+                  </button>
+                ) : link.openNewTab ? (
+                  <a
+                    key={link.name}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.name}
+                  </a>
+                ) : (
                   <Link
                     key={link.name}
                     to={link.href}
@@ -82,15 +126,6 @@ const Header = () => {
                   >
                     {link.name}
                   </Link>
-                ) : (
-                  <a
-                    key={link.name}
-                    href={link.href}
-                    className="text-gray-700 hover:text-kagzat-green transition-colors duration-200 font-medium py-2"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    {link.name}
-                  </a>
                 )
               ))}
               <Link to="/role-selection">
