@@ -22,7 +22,8 @@ import {
   Undo, 
   Redo,
   Trash2,
-  GripVertical
+  GripVertical,
+  Plus
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,6 +33,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { formFieldLibrary, documentLibrary, formatFieldName, formatDocumentName } from '@/lib/formLibrary';
 
 interface FormElement {
   id: string;
@@ -41,60 +43,54 @@ interface FormElement {
   placeholder?: string;
   options?: string[];
   helpText?: string;
+  category?: string;
+  fieldName?: string;
+  documentTypes?: string[];
+  minLength?: number;
+  maxLength?: number;
 }
 
 const FormBuilder = () => {
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [selectedElement, setSelectedElement] = useState<string | null>(null);
-  const [formTitle, setFormTitle] = useState('Transcript Verification Form');
+  const [formTitle, setFormTitle] = useState('Document Verification Form');
+  const [activeTab, setActiveTab] = useState('basic');
   const [formElements, setFormElements] = useState<FormElement[]>([
     {
       id: '1',
       type: 'section',
-      label: 'Student Information',
+      label: 'Personal Information',
       required: false
     },
     {
       id: '2',
-      type: 'text',
-      label: 'Full Name',
+      type: 'predefined-field',
+      label: formatFieldName('full_name'),
       required: true,
+      fieldName: 'full_name',
+      category: 'Identity',
+      minLength: 3,
+      maxLength: 100,
       placeholder: 'Enter your full name'
     },
     {
       id: '3',
-      type: 'text',
-      label: 'Student ID',
-      required: false,
-      placeholder: 'Enter your student ID'
-    },
-    {
-      id: '4',
-      type: 'email',
-      label: 'Email Address',
+      type: 'predefined-field',
+      label: formatFieldName('email_address'),
       required: true,
+      fieldName: 'email_address',
+      category: 'Miscellaneous',
+      minLength: 5,
+      maxLength: 100,
       placeholder: 'Enter your email address'
     },
     {
-      id: '5',
-      type: 'select',
-      label: 'Graduation Year',
+      id: '4',
+      type: 'document-upload',
+      label: 'Identity Verification',
       required: true,
-      options: ['2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024']
-    },
-    {
-      id: '6',
-      type: 'radio',
-      label: 'Degree Type',
-      required: true,
-      options: ['Bachelor\'s', 'Master\'s', 'PhD']
-    },
-    {
-      id: '7',
-      type: 'file',
-      label: 'Upload Official Transcript',
-      required: true,
-      helpText: 'Please upload your official transcript in PDF format'
+      documentTypes: ['passport', 'national_id_card', 'driving_license'],
+      helpText: 'Upload any government-issued ID document'
     }
   ]);
 
@@ -109,7 +105,6 @@ const FormBuilder = () => {
     { type: 'radio', label: 'Radio Buttons', icon: Circle },
     { type: 'checkbox', label: 'Checkboxes', icon: Square },
     { type: 'file', label: 'File Upload', icon: Upload },
-    { type: 'link', label: 'Google Drive Link', icon: Link },
     { type: 'section', label: 'Section Header', icon: Minus },
   ];
 
@@ -125,6 +120,45 @@ const FormBuilder = () => {
         required: false,
         placeholder: result.draggableId === 'text' ? 'Enter text...' : undefined,
         options: ['radio', 'checkbox', 'select'].includes(result.draggableId) ? ['Option 1', 'Option 2'] : undefined
+      };
+
+      const newElements = [...formElements];
+      newElements.splice(result.destination.index, 0, newElement);
+      setFormElements(newElements);
+    } else if (result.source.droppableId.startsWith('predefined-') && result.destination.droppableId === 'canvas') {
+      // Adding predefined field from library
+      const [, category, fieldName] = result.source.droppableId.split('-');
+      const field = formFieldLibrary[category as keyof typeof formFieldLibrary].find(f => f.name === fieldName);
+      
+      if (field) {
+        const newElement: FormElement = {
+          id: Date.now().toString(),
+          type: 'predefined-field',
+          label: formatFieldName(field.name),
+          required: false,
+          fieldName: field.name,
+          category,
+          minLength: field.min_length,
+          maxLength: field.max_length,
+          placeholder: `Enter ${formatFieldName(field.name).toLowerCase()}`
+        };
+
+        const newElements = [...formElements];
+        newElements.splice(result.destination.index, 0, newElement);
+        setFormElements(newElements);
+      }
+    } else if (result.source.droppableId.startsWith('document-') && result.destination.droppableId === 'canvas') {
+      // Adding document upload from library
+      const category = result.source.droppableId.replace('document-', '');
+      const documents = documentLibrary[category as keyof typeof documentLibrary];
+      
+      const newElement: FormElement = {
+        id: Date.now().toString(),
+        type: 'document-upload',
+        label: `${category} Document Upload`,
+        required: true,
+        documentTypes: documents,
+        helpText: `Upload any of the following: ${documents.map(doc => formatDocumentName(doc)).join(', ')}`
       };
 
       const newElements = [...formElements];
@@ -155,6 +189,59 @@ const FormBuilder = () => {
       switch (element.type) {
         case 'section':
           return <h3 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">{element.label}</h3>;
+        case 'predefined-field':
+          return (
+            <div>
+              <Label className="flex items-center gap-2">
+                {element.label} 
+                {element.required && <span className="text-red-500">*</span>}
+                {element.category && <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded">{element.category}</span>}
+              </Label>
+              <Input 
+                placeholder={element.placeholder} 
+                className="mt-1" 
+                maxLength={element.maxLength}
+              />
+              {element.helpText && <p className="text-sm text-gray-500 mt-1">{element.helpText}</p>}
+              {element.minLength && element.maxLength && (
+                <p className="text-xs text-gray-400 mt-1">
+                  {element.minLength}-{element.maxLength} characters
+                </p>
+              )}
+            </div>
+          );
+        case 'document-upload':
+          return (
+            <div>
+              <Label className="flex items-center gap-2">
+                {element.label} 
+                {element.required && <span className="text-red-500">*</span>}
+                <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded">Document</span>
+              </Label>
+              <div className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                <p className="mt-2 text-sm text-gray-600">Click to upload or drag and drop</p>
+                {element.documentTypes && (
+                  <div className="mt-2">
+                    <p className="text-xs text-gray-500 mb-1">Accepted documents:</p>
+                    <div className="flex flex-wrap gap-1">
+                      {element.documentTypes.slice(0, 3).map((docType, idx) => (
+                        <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                          {formatDocumentName(docType)}
+                        </span>
+                      ))}
+                      {element.documentTypes.length > 3 && (
+                        <span className="text-xs text-gray-500">
+                          +{element.documentTypes.length - 3} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {element.helpText && <p className="text-sm text-gray-500 mt-1">{element.helpText}</p>}
+            </div>
+          );
         case 'text':
           return (
             <div>
@@ -323,74 +410,128 @@ const FormBuilder = () => {
         <div className="flex h-[calc(100vh-73px)]">
           {/* Left Sidebar - Component Palette */}
           {!isPreviewMode && (
-            <div className="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto">
+            <div className="w-80 bg-white border-r border-gray-200 p-4 overflow-y-auto">
               <h3 className="font-semibold text-gray-800 mb-4">Form Elements</h3>
               
-              <Droppable droppableId="palette" isDropDisabled={true}>
-                {(provided) => (
-                  <div ref={provided.innerRef} {...provided.droppableProps}>
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium text-gray-600 mb-2">Basic Fields</div>
-                      {componentPalette.slice(0, 6).map((component, index) => (
-                        <Draggable key={component.type} draggableId={component.type} index={index}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`flex items-center gap-2 p-2 rounded-md border cursor-grab transition-all ${
-                                snapshot.isDragging ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                              }`}
-                            >
-                              <component.icon className="h-4 w-4 text-gray-600" />
-                              <span className="text-sm">{component.label}</span>
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="basic">Basic</TabsTrigger>
+                  <TabsTrigger value="fields">Fields</TabsTrigger>
+                  <TabsTrigger value="docs">Docs</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="basic">
+                  <Droppable droppableId="palette" isDropDisabled={true}>
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.droppableProps}>
+                        <div className="space-y-2">
+                          {componentPalette.map((component, index) => (
+                            <Draggable key={component.type} draggableId={component.type} index={index}>
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className={`flex items-center gap-2 p-2 rounded-md border cursor-grab transition-all ${
+                                    snapshot.isDragging ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+                                  }`}
+                                >
+                                  <component.icon className="h-4 w-4 text-gray-600" />
+                                  <span className="text-sm">{component.label}</span>
+                                </div>
+                              )}
+                            </Draggable>
+                          ))}
+                        </div>
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </TabsContent>
+
+                <TabsContent value="fields">
+                  <div className="space-y-4">
+                    {Object.entries(formFieldLibrary).map(([category, fields]) => (
+                      <div key={category}>
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">{category}</h4>
+                        <Droppable droppableId={`predefined-${category}`} isDropDisabled={true}>
+                          {(provided) => (
+                            <div ref={provided.innerRef} {...provided.droppableProps}>
+                              <div className="space-y-1">
+                                {fields.slice(0, 5).map((field, index) => (
+                                  <Draggable key={field.name} draggableId={field.name} index={index}>
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                        {...provided.dragHandleProps}
+                                        className={`p-2 rounded border text-sm cursor-grab transition-all ${
+                                          snapshot.isDragging ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
+                                        }`}
+                                      >
+                                        <div className="font-medium">{formatFieldName(field.name)}</div>
+                                        <div className="text-xs text-gray-500">
+                                          {field.min_length}-{field.max_length} chars
+                                        </div>
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                                {fields.length > 5 && (
+                                  <div className="text-xs text-gray-500 px-2">
+                                    +{fields.length - 5} more fields
+                                  </div>
+                                )}
+                              </div>
+                              {provided.placeholder}
                             </div>
                           )}
-                        </Draggable>
-                      ))}
-                      
-                      <div className="text-sm font-medium text-gray-600 mb-2 mt-4">Selection Fields</div>
-                      {componentPalette.slice(6, 9).map((component, index) => (
-                        <Draggable key={component.type} draggableId={component.type} index={index + 6}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`flex items-center gap-2 p-2 rounded-md border cursor-grab transition-all ${
-                                snapshot.isDragging ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                              }`}
-                            >
-                              <component.icon className="h-4 w-4 text-gray-600" />
-                              <span className="text-sm">{component.label}</span>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      
-                      <div className="text-sm font-medium text-gray-600 mb-2 mt-4">Document Fields</div>
-                      {componentPalette.slice(9, 12).map((component, index) => (
-                        <Draggable key={component.type} draggableId={component.type} index={index + 9}>
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`flex items-center gap-2 p-2 rounded-md border cursor-grab transition-all ${
-                                snapshot.isDragging ? 'bg-blue-100 border-blue-300' : 'bg-gray-50 hover:bg-gray-100 border-gray-200'
-                              }`}
-                            >
-                              <component.icon className="h-4 w-4 text-gray-600" />
-                              <span className="text-sm">{component.label}</span>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                    </div>
-                    {provided.placeholder}
+                        </Droppable>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </Droppable>
+                </TabsContent>
+
+                <TabsContent value="docs">
+                  <div className="space-y-4">
+                    {Object.entries(documentLibrary).map(([category, documents]) => (
+                      <div key={category}>
+                        <Droppable droppableId={`document-${category}`} isDropDisabled={true}>
+                          {(provided) => (
+                            <div ref={provided.innerRef} {...provided.droppableProps}>
+                              <Draggable key={category} draggableId={category} index={0}>
+                                {(provided, snapshot) => (
+                                  <div
+                                    ref={provided.innerRef}
+                                    {...provided.draggableProps}
+                                    {...provided.dragHandleProps}
+                                    className={`p-3 rounded border cursor-grab transition-all ${
+                                      snapshot.isDragging ? 'bg-green-100 border-green-300' : 'bg-green-50 hover:bg-green-100 border-green-200'
+                                    }`}
+                                  >
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Upload className="h-4 w-4 text-green-600" />
+                                      <span className="font-medium text-green-800">{category} Documents</span>
+                                    </div>
+                                    <div className="text-xs text-green-600">
+                                      {documents.length} document types
+                                    </div>
+                                    <div className="text-xs text-gray-500 mt-1">
+                                      {documents.slice(0, 2).map(doc => formatDocumentName(doc)).join(', ')}
+                                      {documents.length > 2 && '...'}
+                                    </div>
+                                  </div>
+                                )}
+                              </Draggable>
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+                      </div>
+                    ))}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
           )}
 
@@ -463,15 +604,50 @@ const FormBuilder = () => {
                         />
                       </div>
                       
-                      {['text', 'textarea', 'email'].includes(selectedElementData.type) && (
+                      {selectedElementData.type === 'predefined-field' && (
+                        <>
+                          <div>
+                            <Label>Field Category</Label>
+                            <Input
+                              value={selectedElementData.category || ''}
+                              disabled
+                              className="mt-1 bg-gray-50"
+                            />
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <Label>Min Length</Label>
+                              <Input
+                                type="number"
+                                value={selectedElementData.minLength || ''}
+                                onChange={(e) => updateElement(selectedElementData.id, { minLength: parseInt(e.target.value) })}
+                                className="mt-1"
+                              />
+                            </div>
+                            <div>
+                              <Label>Max Length</Label>
+                              <Input
+                                type="number"
+                                value={selectedElementData.maxLength || ''}
+                                onChange={(e) => updateElement(selectedElementData.id, { maxLength: parseInt(e.target.value) })}
+                                className="mt-1"
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      
+                      {selectedElementData.type === 'document-upload' && (
                         <div>
-                          <Label htmlFor="placeholder">Placeholder Text</Label>
-                          <Input
-                            id="placeholder"
-                            value={selectedElementData.placeholder || ''}
-                            onChange={(e) => updateElement(selectedElementData.id, { placeholder: e.target.value })}
-                            className="mt-1"
-                          />
+                          <Label>Accepted Documents</Label>
+                          <div className="mt-2 space-y-1">
+                            {selectedElementData.documentTypes?.map((docType, index) => (
+                              <div key={index} className="text-sm bg-gray-100 px-2 py-1 rounded">
+                                {formatDocumentName(docType)}
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       )}
                       
@@ -485,47 +661,6 @@ const FormBuilder = () => {
                           rows={3}
                         />
                       </div>
-                      
-                      {['radio', 'checkbox', 'select'].includes(selectedElementData.type) && (
-                        <div>
-                          <Label>Options</Label>
-                          <div className="mt-2 space-y-2">
-                            {selectedElementData.options?.map((option, index) => (
-                              <div key={index} className="flex gap-2">
-                                <Input
-                                  value={option}
-                                  onChange={(e) => {
-                                    const newOptions = [...(selectedElementData.options || [])];
-                                    newOptions[index] = e.target.value;
-                                    updateElement(selectedElementData.id, { options: newOptions });
-                                  }}
-                                  className="flex-1"
-                                />
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => {
-                                    const newOptions = selectedElementData.options?.filter((_, i) => i !== index);
-                                    updateElement(selectedElementData.id, { options: newOptions });
-                                  }}
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const newOptions = [...(selectedElementData.options || []), `Option ${(selectedElementData.options?.length || 0) + 1}`];
-                                updateElement(selectedElementData.id, { options: newOptions });
-                              }}
-                            >
-                              Add Option
-                            </Button>
-                          </div>
-                        </div>
-                      )}
                     </>
                   )}
                 </div>
