@@ -10,6 +10,7 @@ import RoleSelection from "./pages/RoleSelection";
 import UserSignup from "./pages/UserSignup";
 import ValidatorSignup from "./pages/ValidatorSignup";
 import OrganizationSignup from "./pages/OrganizationSignup";
+import UserOnboarding from "./pages/UserOnboarding";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/signup/user" element={<UserSignup />} />
           <Route path="/signup/validator" element={<ValidatorSignup />} />
           <Route path="/signup/organization" element={<OrganizationSignup />} />
+          <Route path="/onboarding/user" element={<UserOnboarding />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

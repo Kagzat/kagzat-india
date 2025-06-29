@@ -291,10 +291,10 @@ const UserSignup = () => {
                         <p className="text-gray-600">Your account is ready to use</p>
                       </div>
                       <Button
-                        onClick={() => console.log('Navigate to dashboard')}
+                        onClick={() => window.location.href = '/onboarding/user'}
                         className="w-full bg-kagzat-yellow hover:bg-yellow-500 text-kagzat-black font-semibold"
                       >
-                        Continue to Dashboard
+                        Continue to Onboarding
                       </Button>
                     </div>
                   )}
