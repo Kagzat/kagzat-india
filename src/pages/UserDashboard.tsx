@@ -1,17 +1,23 @@
+
 import { useState } from 'react';
 import { FileText, Clock, CheckCircle, Star, Search, Plus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserSidebar from '@/components/user/UserSidebar';
 import ActiveRequests from '@/components/user/ActiveRequests';
 import RecentSubmissions from '@/components/user/RecentSubmissions';
 import DocumentLibrary from '@/components/user/DocumentLibrary';
 import QuickSubmit from '@/components/user/QuickSubmit';
+import UserSearchSection from '@/components/user/UserSearchSection';
+import UserAutoFillFlow from '@/components/user/UserAutoFillFlow';
 
 const UserDashboard = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [showAutoFillFlow, setShowAutoFillFlow] = useState(false);
 
   const quickStats = [
     {
@@ -44,9 +50,23 @@ const UserDashboard = () => {
     }
   ];
 
+  const handleNewRequest = () => {
+    setShowAutoFillFlow(true);
+  };
+
+  const handleAutoFillComplete = () => {
+    setShowAutoFillFlow(false);
+    setActiveTab('overview');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      <UserSidebar open={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+      <UserSidebar 
+        open={sidebarOpen} 
+        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
       
       <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-16'} min-w-0`}>
         {/* Header Section */}
@@ -58,59 +78,74 @@ const UserDashboard = () => {
                 Premium Member
               </Badge>
             </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input 
-                  placeholder="Search documents, requests..." 
-                  className="pl-10 w-full sm:w-80"
-                />
-              </div>
-              <Button className="w-full sm:w-auto flex-shrink-0">
-                <Plus className="h-4 w-4 mr-2" />
-                New Request
-              </Button>
-            </div>
+            <Button onClick={handleNewRequest} className="w-full sm:w-auto flex-shrink-0">
+              <Plus className="h-4 w-4 mr-2" />
+              New Request
+            </Button>
           </div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Auto Fill Flow Modal */}
+        {showAutoFillFlow && (
+          <UserAutoFillFlow onComplete={handleAutoFillComplete} />
+        )}
+
+        {/* Main Content */}
         <div className="p-4 lg:p-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-6 lg:mb-8">
-            {quickStats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={index} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 lg:p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-gray-600 truncate">{stat.title}</p>
-                        <p className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                      </div>
-                      <div className={`p-3 rounded-full ${stat.bgColor} flex-shrink-0`}>
-                        <Icon className={`h-5 w-5 lg:h-6 lg:w-6 ${stat.color}`} />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="overview">Dashboard</TabsTrigger>
+              <TabsTrigger value="search">Find Validators</TabsTrigger>
+              <TabsTrigger value="requests">My Requests</TabsTrigger>
+            </TabsList>
 
-          {/* Main Dashboard Grid */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-            {/* Left Column - Active Requests */}
-            <div className="xl:col-span-2 space-y-6">
-              <ActiveRequests />
-              <RecentSubmissions />
-            </div>
+            <TabsContent value="overview" className="space-y-6">
+              {/* Quick Stats */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                {quickStats.map((stat, index) => {
+                  const Icon = stat.icon;
+                  return (
+                    <Card key={index} className="hover:shadow-md transition-shadow">
+                      <CardContent className="p-4 lg:p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-medium text-gray-600 truncate">{stat.title}</p>
+                            <p className="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                          </div>
+                          <div className={`p-3 rounded-full ${stat.bgColor} flex-shrink-0`}>
+                            <Icon className={`h-5 w-5 lg:h-6 lg:w-6 ${stat.color}`} />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
 
-            {/* Right Column - Tools & Library */}
-            <div className="space-y-6">
-              <QuickSubmit />
-              <DocumentLibrary />
-            </div>
-          </div>
+              {/* Main Dashboard Grid */}
+              <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+                <div className="xl:col-span-2 space-y-6">
+                  <ActiveRequests />
+                  <RecentSubmissions />
+                </div>
+                <div className="space-y-6">
+                  <QuickSubmit />
+                  <DocumentLibrary />
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="search">
+              <UserSearchSection onStartRequest={handleNewRequest} />
+            </TabsContent>
+
+            <TabsContent value="requests">
+              <div className="space-y-6">
+                <ActiveRequests />
+                <RecentSubmissions />
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

@@ -3,14 +3,13 @@ import { useState } from 'react';
 import { 
   LayoutDashboard, 
   Users, 
-  FileCheck, 
-  Upload, 
-  BarChart3, 
+  FileText, 
   Settings, 
   HelpCircle,
   Menu,
   X,
-  CreditCard
+  BarChart3,
+  FormInput
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,21 +17,29 @@ import { Badge } from '@/components/ui/badge';
 interface OrganizationSidebarProps {
   open: boolean;
   onToggle: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
-const OrganizationSidebar = ({ open, onToggle }: OrganizationSidebarProps) => {
+const OrganizationSidebar = ({ open, onToggle, activeTab = 'overview', onTabChange }: OrganizationSidebarProps) => {
   const [activeItem, setActiveItem] = useState('dashboard');
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
-    { id: 'requests', label: 'Team Requests', icon: FileCheck, badge: '127' },
-    { id: 'bulk', label: 'Bulk Operations', icon: Upload, badge: null },
-    { id: 'team', label: 'Team Management', icon: Users, badge: null },
-    { id: 'analytics', label: 'Analytics & Reports', icon: BarChart3, badge: null },
-    { id: 'billing', label: 'Billing & Usage', icon: CreditCard, badge: null },
-    { id: 'settings', label: 'Organization Settings', icon: Settings, badge: null },
-    { id: 'help', label: 'Help & Support', icon: HelpCircle, badge: null },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null, tab: 'overview' },
+    { id: 'team', label: 'Team Management', icon: Users, badge: '12', tab: 'team' },
+    { id: 'requests', label: 'Validation Requests', icon: FileText, badge: '47', tab: 'requests' },
+    { id: 'forms', label: 'Form Builder', icon: FormInput, badge: null, tab: 'forms' },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: null, tab: null },
+    { id: 'settings', label: 'Organization Settings', icon: Settings, badge: null, tab: null },
+    { id: 'help', label: 'Help & Support', icon: HelpCircle, badge: null, tab: null },
   ];
+
+  const handleItemClick = (item: typeof menuItems[0]) => {
+    setActiveItem(item.id);
+    if (item.tab && onTabChange) {
+      onTabChange(item.tab);
+    }
+  };
 
   return (
     <>
@@ -53,7 +60,7 @@ const OrganizationSidebar = ({ open, onToggle }: OrganizationSidebarProps) => {
           <div className="flex items-center justify-between">
             {open && (
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                   <span className="text-white font-bold text-sm">K</span>
                 </div>
                 <span className="font-semibold text-gray-900">Kagzat</span>
@@ -75,24 +82,24 @@ const OrganizationSidebar = ({ open, onToggle }: OrganizationSidebarProps) => {
           <div className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeItem === item.id;
+              const isActive = activeItem === item.id || (item.tab && activeTab === item.tab);
               
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveItem(item.id)}
-                  className={`w-full flex items-center ${open ? 'justify-start space-x-3 px-3' : 'justify-center px-2'} py-2 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => handleItemClick(item)}
+                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive 
-                      ? 'bg-purple-50 text-purple-700 border border-purple-200' 
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200' 
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   {open && (
                     <>
-                      <span className="flex-1 text-left truncate">{item.label}</span>
+                      <span className="flex-1 text-left">{item.label}</span>
                       {item.badge && (
-                        <Badge variant="secondary" className="bg-purple-100 text-purple-800 text-xs flex-shrink-0">
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
                           {item.badge}
                         </Badge>
                       )}

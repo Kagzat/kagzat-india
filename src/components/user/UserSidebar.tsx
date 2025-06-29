@@ -10,7 +10,8 @@ import {
   HelpCircle,
   Menu,
   X,
-  Star
+  Star,
+  Search
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,21 +19,31 @@ import { Badge } from '@/components/ui/badge';
 interface UserSidebarProps {
   open: boolean;
   onToggle: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
-const UserSidebar = ({ open, onToggle }: UserSidebarProps) => {
+const UserSidebar = ({ open, onToggle, activeTab = 'overview', onTabChange }: UserSidebarProps) => {
   const [activeItem, setActiveItem] = useState('dashboard');
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
-    { id: 'active', label: 'Active Requests', icon: Clock, badge: '5' },
-    { id: 'completed', label: 'Completed', icon: CheckCircle, badge: null },
-    { id: 'documents', label: 'My Documents', icon: FileText, badge: null },
-    { id: 'payments', label: 'Payments & Billing', icon: CreditCard, badge: null },
-    { id: 'reviews', label: 'My Reviews', icon: Star, badge: null },
-    { id: 'settings', label: 'Account Settings', icon: Settings, badge: null },
-    { id: 'help', label: 'Help & Support', icon: HelpCircle, badge: null },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null, tab: 'overview' },
+    { id: 'search', label: 'Find Validators', icon: Search, badge: null, tab: 'search' },
+    { id: 'active', label: 'Active Requests', icon: Clock, badge: '5', tab: 'requests' },
+    { id: 'completed', label: 'Completed', icon: CheckCircle, badge: null, tab: null },
+    { id: 'documents', label: 'My Documents', icon: FileText, badge: null, tab: null },
+    { id: 'payments', label: 'Payments & Billing', icon: CreditCard, badge: null, tab: null },
+    { id: 'reviews', label: 'My Reviews', icon: Star, badge: null, tab: null },
+    { id: 'settings', label: 'Account Settings', icon: Settings, badge: null, tab: null },
+    { id: 'help', label: 'Help & Support', icon: HelpCircle, badge: null, tab: null },
   ];
+
+  const handleItemClick = (item: typeof menuItems[0]) => {
+    setActiveItem(item.id);
+    if (item.tab && onTabChange) {
+      onTabChange(item.tab);
+    }
+  };
 
   return (
     <>
@@ -75,12 +86,12 @@ const UserSidebar = ({ open, onToggle }: UserSidebarProps) => {
           <div className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeItem === item.id;
+              const isActive = activeItem === item.id || (item.tab && activeTab === item.tab);
               
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveItem(item.id)}
+                  onClick={() => handleItemClick(item)}
                   className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive 
                       ? 'bg-blue-50 text-blue-700 border border-blue-200' 

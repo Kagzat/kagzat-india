@@ -4,11 +4,13 @@ import {
   LayoutDashboard, 
   Clock, 
   CheckCircle, 
-  DollarSign, 
+  BarChart3,
   Settings, 
   HelpCircle,
   Menu,
-  X
+  X,
+  Bell,
+  FormInput
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,19 +18,30 @@ import { Badge } from '@/components/ui/badge';
 interface ValidatorSidebarProps {
   open: boolean;
   onToggle: () => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
 }
 
-const ValidatorSidebar = ({ open, onToggle }: ValidatorSidebarProps) => {
+const ValidatorSidebar = ({ open, onToggle, activeTab = 'overview', onTabChange }: ValidatorSidebarProps) => {
   const [activeItem, setActiveItem] = useState('dashboard');
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
-    { id: 'pending', label: 'Pending Validations', icon: Clock, badge: '12' },
-    { id: 'completed', label: 'Completed Validations', icon: CheckCircle, badge: null },
-    { id: 'earnings', label: 'Earnings & Reports', icon: DollarSign, badge: null },
-    { id: 'settings', label: 'Profile Settings', icon: Settings, badge: null },
-    { id: 'help', label: 'Help & Support', icon: HelpCircle, badge: null },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null, tab: 'overview' },
+    { id: 'pending', label: 'Pending Validations', icon: Clock, badge: '8', tab: 'pending' },
+    { id: 'completed', label: 'Completed', icon: CheckCircle, badge: null, tab: 'completed' },
+    { id: 'templates', label: 'Form Templates', icon: FormInput, badge: null, tab: 'templates' },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, badge: null, tab: null },
+    { id: 'notifications', label: 'Notifications', icon: Bell, badge: '3', tab: null },
+    { id: 'settings', label: 'Settings', icon: Settings, badge: null, tab: null },
+    { id: 'help', label: 'Help & Support', icon: HelpCircle, badge: null, tab: null },
   ];
+
+  const handleItemClick = (item: typeof menuItems[0]) => {
+    setActiveItem(item.id);
+    if (item.tab && onTabChange) {
+      onTabChange(item.tab);
+    }
+  };
 
   return (
     <>
@@ -71,13 +84,13 @@ const ValidatorSidebar = ({ open, onToggle }: ValidatorSidebarProps) => {
           <div className="space-y-2">
             {menuItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeItem === item.id;
+              const isActive = activeItem === item.id || (item.tab && activeTab === item.tab);
               
               return (
                 <button
                   key={item.id}
-                  onClick={() => setActiveItem(item.id)}
-                  className={`w-full flex items-center ${open ? 'justify-start space-x-3 px-3' : 'justify-center px-2'} py-2 rounded-lg text-sm font-medium transition-colors ${
+                  onClick={() => handleItemClick(item)}
+                  className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive 
                       ? 'bg-blue-50 text-blue-700 border border-blue-200' 
                       : 'text-gray-700 hover:bg-gray-50'
@@ -86,9 +99,9 @@ const ValidatorSidebar = ({ open, onToggle }: ValidatorSidebarProps) => {
                   <Icon className="h-5 w-5 flex-shrink-0" />
                   {open && (
                     <>
-                      <span className="flex-1 text-left truncate">{item.label}</span>
+                      <span className="flex-1 text-left">{item.label}</span>
                       {item.badge && (
-                        <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs flex-shrink-0">
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
                           {item.badge}
                         </Badge>
                       )}
