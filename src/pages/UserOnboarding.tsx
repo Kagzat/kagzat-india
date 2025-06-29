@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Save, Check, Link as LinkIcon, FileText, Calendar, Globe, MapPin } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Save, Check, Link as LinkIcon, FileText, Calendar, Globe, MapPin, User, GraduationCap, Briefcase, CreditCard, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,26 +14,35 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
+import { formFieldLibrary, documentLibrary, formatFieldName, formatDocumentName, validateField } from '@/lib/formLibrary';
 
 interface UserData {
+  // Basic info
   fullName: string;
   email: string;
   phone: string;
-  dateOfBirth: Date | undefined;
-  gender: string;
-  nationality: string;
-  address: string;
-  city: string;
-  state: string;
-  country: string;
-  postalCode: string;
-  documentCategories: string[];
+  
+  // Category data
+  selectedCategories: string[];
+  
+  // Field data by category
+  Identity: Record<string, string>;
+  Address: Record<string, string>;
+  Education: Record<string, string>;
+  Work: Record<string, string>;
+  Finances: Record<string, string>;
+  Property: Record<string, string>;
+  Miscellaneous: Record<string, string>;
+  
+  // Document links
   documentLinks: Array<{
     category: string;
     type: string;
     url: string;
     filename: string;
   }>;
+  
+  // Preferences
   emailNotifications: boolean;
   smsNotifications: boolean;
   whatsappNotifications: boolean;
@@ -40,36 +50,42 @@ interface UserData {
   expressValidation: boolean;
 }
 
-const documentCategories = [
+const documentCategoryConfig = [
   {
-    id: 'identity',
+    id: 'Identity',
     title: 'Identity Documents',
-    description: 'Passport, Aadhaar, Driver\'s License, Voter ID',
-    types: ['Passport', 'Aadhaar Card', 'Driver\'s License', 'Voter ID', 'PAN Card']
+    description: 'Passport, National ID, Driving License, Birth Certificate',
+    icon: User
   },
   {
-    id: 'educational',
+    id: 'Address',
+    title: 'Address Proof Documents',
+    description: 'Utility Bills, Bank Statements, Lease Agreements',
+    icon: MapPin
+  },
+  {
+    id: 'Education',
     title: 'Educational Documents',
     description: 'Degrees, Certificates, Transcripts, Mark Sheets',
-    types: ['Degree Certificate', 'Diploma', 'Transcript', 'Mark Sheet', 'Course Certificate']
+    icon: GraduationCap
   },
   {
-    id: 'work',
+    id: 'Work',
     title: 'Work Documents',
     description: 'Employment Letters, Experience Certificates, Salary Slips',
-    types: ['Employment Letter', 'Experience Certificate', 'Salary Slip', 'Appointment Letter', 'Relieving Letter']
+    icon: Briefcase
   },
   {
-    id: 'financial',
+    id: 'Finances',
     title: 'Financial Documents',
     description: 'Bank Statements, Tax Returns, Income Certificates',
-    types: ['Bank Statement', 'Tax Return', 'Income Certificate', 'Form 16', 'Investment Certificate']
+    icon: CreditCard
   },
   {
-    id: 'property',
+    id: 'Property',
     title: 'Property Documents',
     description: 'Property Deeds, Tax Receipts, Registration Documents',
-    types: ['Property Deed', 'Tax Receipt', 'Registration Document', 'Sale Agreement', 'NOC']
+    icon: Home
   }
 ];
 
@@ -84,24 +100,20 @@ const countries = [
 const UserOnboarding = () => {
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [userData, setUserData] = useState<UserData>({
     fullName: 'John Doe',
     email: 'john.doe@example.com',
     phone: '+91 9876543210',
-    dateOfBirth: undefined,
-    gender: '',
-    nationality: '',
-    address: '',
-    city: '',
-    state: '',
-    country: '',
-    postalCode: '',
-    documentCategories: [],
-    documentLinks: [
-      { category: 'identity', type: 'Passport', url: 'https://drive.google.com/file/d/1abc...', filename: 'Passport.pdf' },
-      { category: 'educational', type: 'Degree Certificate', url: 'https://drive.google.com/file/d/2def...', filename: 'MBA_Certificate.pdf' },
-      { category: 'work', type: 'Experience Certificate', url: 'https://drive.google.com/file/d/3ghi...', filename: 'Experience_Letter.pdf' }
-    ],
+    selectedCategories: [],
+    Identity: {},
+    Address: {},
+    Education: {},
+    Work: {},
+    Finances: {},
+    Property: {},
+    Miscellaneous: {},
+    documentLinks: [],
     emailNotifications: true,
     smsNotifications: false,
     whatsappNotifications: true,
@@ -137,25 +149,59 @@ const UserOnboarding = () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsLoading(false);
-    setStep(5); // Success screen
+    setStep(6); // Success screen
   };
 
   const handleCategoryToggle = (categoryId: string) => {
     setUserData(prev => ({
       ...prev,
-      documentCategories: prev.documentCategories.includes(categoryId)
-        ? prev.documentCategories.filter(id => id !== categoryId)
-        : [...prev.documentCategories, categoryId]
+      selectedCategories: prev.selectedCategories.includes(categoryId)
+        ? prev.selectedCategories.filter(id => id !== categoryId)
+        : [...prev.selectedCategories, categoryId]
     }));
+  };
+
+  const handleFieldChange = (category: keyof typeof formFieldLibrary, fieldName: string, value: string) => {
+    setUserData(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        [fieldName]: value
+      }
+    }));
+
+    // Clear error when user starts typing
+    const errorKey = `${category}.${fieldName}`;
+    if (errors[errorKey]) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
+
+  const validateCategory = (category: keyof typeof formFieldLibrary): boolean => {
+    const newErrors: Record<string, string> = {};
+    let isValid = true;
+
+    formFieldLibrary[category].forEach(field => {
+      const value = userData[category][field.name] || '';
+      const error = validateField(field.name, value, category);
+      if (error) {
+        newErrors[`${category}.${field.name}`] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(prev => ({ ...prev, ...newErrors }));
+    return isValid;
   };
 
   const handleAddDocument = (categoryId: string) => {
     if (!newDocumentUrl || !selectedDocumentType) return;
     
-    // Extract filename from URL or use document type as default
-    const filename = newDocumentUrl.includes('/') 
-      ? newDocumentUrl.split('/').pop()?.split('?')[0] || selectedDocumentType 
-      : selectedDocumentType;
+    const filename = formatDocumentName(selectedDocumentType);
     
     setUserData(prev => ({
       ...prev,
@@ -175,201 +221,141 @@ const UserOnboarding = () => {
   const renderStep1 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Personal Information</h2>
-        <p className="text-gray-600">Tell us about yourself to get started</p>
+        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Select Document Categories</h2>
+        <p className="text-gray-600">Choose the types of documents you have</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="fullName">Full Name</Label>
-          <Input
-            id="fullName"
-            value={userData.fullName}
-            onChange={(e) => setUserData(prev => ({ ...prev, fullName: e.target.value }))}
-            className="mt-1"
-          />
-        </div>
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={userData.email}
-            disabled
-            className="mt-1 bg-gray-50"
-          />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            value={userData.phone}
-            disabled
-            className="mt-1 bg-gray-50"
-          />
-        </div>
-        <div>
-          <Label>Date of Birth</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal mt-1">
-                <Calendar className="mr-2 h-4 w-4" />
-                {userData.dateOfBirth ? format(userData.dateOfBirth, "PPP") : "Select date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={userData.dateOfBirth}
-                onSelect={(date) => setUserData(prev => ({ ...prev, dateOfBirth: date }))}
-                disabled={(date) => date > new Date() || date < new Date("1900-01-01")}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label>Gender</Label>
-          <Select value={userData.gender} onValueChange={(value) => setUserData(prev => ({ ...prev, gender: value }))}>
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select gender" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">Male</SelectItem>
-              <SelectItem value="female">Female</SelectItem>
-              <SelectItem value="other">Other</SelectItem>
-              <SelectItem value="prefer-not-to-say">Prefer not to say</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label>Nationality</Label>
-          <Select value={userData.nationality} onValueChange={(value) => setUserData(prev => ({ ...prev, nationality: value }))}>
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select nationality" />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.map(country => (
-                <SelectItem key={country.code} value={country.code}>
-                  <span className="flex items-center gap-2">
-                    <span>{country.flag}</span>
-                    {country.name}
-                  </span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor="address">Address</Label>
-        <Textarea
-          id="address"
-          value={userData.address}
-          onChange={(e) => setUserData(prev => ({ ...prev, address: e.target.value }))}
-          placeholder="Enter your full address"
-          className="mt-1"
-          rows={3}
-        />
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="city">City</Label>
-          <Input
-            id="city"
-            value={userData.city}
-            onChange={(e) => setUserData(prev => ({ ...prev, city: e.target.value }))}
-            className="mt-1"
-          />
-        </div>
-        <div>
-          <Label htmlFor="state">State</Label>
-          <Input
-            id="state"
-            value={userData.state}
-            onChange={(e) => setUserData(prev => ({ ...prev, state: e.target.value }))}
-            className="mt-1"
-          />
-        </div>
-      </div>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor="country">Country</Label>
-          <Input
-            id="country"
-            value={userData.country}
-            onChange={(e) => setUserData(prev => ({ ...prev, country: e.target.value }))}
-            className="mt-1"
-          />
-        </div>
-        <div>
-          <Label htmlFor="postalCode">Postal Code</Label>
-          <Input
-            id="postalCode"
-            value={userData.postalCode}
-            onChange={(e) => setUserData(prev => ({ ...prev, postalCode: e.target.value }))}
-            className="mt-1"
-          />
-        </div>
+      <div className="grid gap-4">
+        {documentCategoryConfig.map((category) => {
+          const Icon = category.icon;
+          return (
+            <Card
+              key={category.id}
+              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                userData.selectedCategories.includes(category.id)
+                  ? 'border-kagzat-green bg-kagzat-green/5'
+                  : 'border-gray-200'
+              }`}
+              onClick={() => handleCategoryToggle(category.id)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start gap-4">
+                  <Checkbox
+                    checked={userData.selectedCategories.includes(category.id)}
+                    onChange={() => handleCategoryToggle(category.id)}
+                    className="mt-1"
+                  />
+                  <Icon className="h-6 w-6 text-kagzat-green mt-1" />
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-kagzat-black mb-1">{category.title}</h3>
+                    <p className="text-gray-600 text-sm mb-2">{category.description}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {documentLibrary[category.id as keyof typeof documentLibrary].slice(0, 3).map((type, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {formatDocumentName(type)}
+                        </Badge>
+                      ))}
+                      {documentLibrary[category.id as keyof typeof documentLibrary].length > 3 && (
+                        <Badge variant="secondary" className="text-xs">
+                          +{documentLibrary[category.id as keyof typeof documentLibrary].length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );
 
+  const renderCategoryFields = (category: keyof typeof formFieldLibrary) => {
+    const fields = formFieldLibrary[category];
+    const categoryConfig = documentCategoryConfig.find(c => c.id === category);
+    const Icon = categoryConfig?.icon || FileText;
+
+    return (
+      <Card key={category} className="border-gray-200">
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold flex items-center gap-2">
+            <Icon className="h-5 w-5 text-kagzat-green" />
+            {categoryConfig?.title || category} Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid md:grid-cols-2 gap-4">
+            {fields.map((field) => (
+              <div key={field.name}>
+                <Label htmlFor={`${category}.${field.name}`}>
+                  {formatFieldName(field.name)}
+                  {field.min_length > 0 && <span className="text-red-500 ml-1">*</span>}
+                </Label>
+                {field.name.includes('date') ? (
+                  <Input
+                    id={`${category}.${field.name}`}
+                    type="date"
+                    value={userData[category][field.name] || ''}
+                    onChange={(e) => handleFieldChange(category, field.name, e.target.value)}
+                    className="mt-1"
+                  />
+                ) : field.name.includes('email') ? (
+                  <Input
+                    id={`${category}.${field.name}`}
+                    type="email"
+                    value={userData[category][field.name] || ''}
+                    onChange={(e) => handleFieldChange(category, field.name, e.target.value)}
+                    className="mt-1"
+                  />
+                ) : field.name.includes('phone') || field.name.includes('contact') ? (
+                  <Input
+                    id={`${category}.${field.name}`}
+                    type="tel"
+                    value={userData[category][field.name] || ''}
+                    onChange={(e) => handleFieldChange(category, field.name, e.target.value)}
+                    className="mt-1"
+                  />
+                ) : field.max_length > 100 ? (
+                  <Textarea
+                    id={`${category}.${field.name}`}
+                    value={userData[category][field.name] || ''}
+                    onChange={(e) => handleFieldChange(category, field.name, e.target.value)}
+                    className="mt-1"
+                    rows={3}
+                  />
+                ) : (
+                  <Input
+                    id={`${category}.${field.name}`}
+                    value={userData[category][field.name] || ''}
+                    onChange={(e) => handleFieldChange(category, field.name, e.target.value)}
+                    className="mt-1"
+                  />
+                )}
+                {errors[`${category}.${field.name}`] && (
+                  <p className="text-red-500 text-sm mt-1">{errors[`${category}.${field.name}`]}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {field.min_length === 0 ? 'Optional' : `Required`} • {field.min_length}-{field.max_length} characters
+                </p>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Document Categories</h2>
-        <p className="text-gray-600">Select the types of documents you have</p>
+        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Fill Your Information</h2>
+        <p className="text-gray-600">Complete the details for your selected categories</p>
       </div>
 
-      <div className="grid gap-4">
-        {documentCategories.map((category) => (
-          <Card
-            key={category.id}
-            className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-              userData.documentCategories.includes(category.id)
-                ? 'border-kagzat-green bg-kagzat-green/5'
-                : 'border-gray-200'
-            }`}
-            onClick={() => handleCategoryToggle(category.id)}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-start gap-4">
-                <Checkbox
-                  checked={userData.documentCategories.includes(category.id)}
-                  onChange={() => handleCategoryToggle(category.id)}
-                  className="mt-1"
-                />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-kagzat-black mb-1">{category.title}</h3>
-                  <p className="text-gray-600 text-sm mb-2">{category.description}</p>
-                  <div className="flex flex-wrap gap-1">
-                    {category.types.slice(0, 3).map((type, index) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {type}
-                      </Badge>
-                    ))}
-                    {category.types.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{category.types.length - 3} more
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      {userData.selectedCategories.map((categoryId) => 
+        renderCategoryFields(categoryId as keyof typeof formFieldLibrary)
+      )}
     </div>
   );
 
@@ -380,18 +366,17 @@ const UserOnboarding = () => {
         <p className="text-gray-600">Provide Google Drive links for your documents</p>
       </div>
 
-      {userData.documentCategories.map((categoryId) => {
-        const category = documentCategories.find(cat => cat.id === categoryId);
-        if (!category) return null;
-
+      {userData.selectedCategories.map((categoryId) => {
+        const categoryConfig = documentCategoryConfig.find(c => c.id === categoryId);
         const categoryDocs = userData.documentLinks.filter(doc => doc.category === categoryId);
+        const Icon = categoryConfig?.icon || FileText;
 
         return (
           <Card key={categoryId} className="border-gray-200">
             <CardHeader>
               <CardTitle className="text-lg font-semibold flex items-center gap-2">
-                <FileText className="h-5 w-5 text-kagzat-green" />
-                {category.title}
+                <Icon className="h-5 w-5 text-kagzat-green" />
+                {categoryConfig?.title || categoryId}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -422,9 +407,9 @@ const UserOnboarding = () => {
                         <SelectValue placeholder="Select document type" />
                       </SelectTrigger>
                       <SelectContent>
-                        {category.types.map(type => (
+                        {documentLibrary[categoryId as keyof typeof documentLibrary].map(type => (
                           <SelectItem key={type} value={type}>
-                            {type}
+                            {formatDocumentName(type)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -459,7 +444,7 @@ const UserOnboarding = () => {
               ) : (
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                   <LinkIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-                  <p className="text-gray-600 mb-4">Add more {category.title.toLowerCase()}</p>
+                  <p className="text-gray-600 mb-4">Add {categoryConfig?.title.toLowerCase() || categoryId.toLowerCase()}</p>
                   <Button 
                     variant="outline" 
                     onClick={() => setAddingToCategory(categoryId)}
@@ -572,12 +557,12 @@ const UserOnboarding = () => {
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="flex justify-between">
-            <span className="text-gray-600">Documents Uploaded:</span>
+            <span className="text-gray-600">Documents Linked:</span>
             <span className="font-medium">{userData.documentLinks.length}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Categories Selected:</span>
-            <span className="font-medium">{userData.documentCategories.length}</span>
+            <span className="text-gray-600">Categories Completed:</span>
+            <span className="font-medium">{userData.selectedCategories.length}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Profile Completion:</span>
@@ -596,6 +581,15 @@ const UserOnboarding = () => {
     </div>
   );
 
+  const totalSteps = 5;
+  const stepTitles = [
+    'Document Categories',
+    'Personal Information',
+    'Document Links',
+    'Preferences',
+    'Complete'
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50">
       {/* Header */}
@@ -605,9 +599,9 @@ const UserOnboarding = () => {
             <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-kagzat-black">
               Kagzat
             </Link>
-            {step < 5 && (
+            {step < 6 && (
               <div className="text-sm text-gray-600">
-                Step {step} of 4 - {step === 1 ? 'Personal Details' : step === 2 ? 'Document Categories' : step === 3 ? 'Document Links' : 'Preferences'}
+                Step {step} of {totalSteps} - {stepTitles[step - 1]}
               </div>
             )}
           </div>
@@ -617,23 +611,23 @@ const UserOnboarding = () => {
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Progress Bar */}
-          {step < 5 && (
+          {step < 6 && (
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">Progress</span>
-                <span className="text-sm text-gray-500">{Math.round((step / 4) * 100)}%</span>
+                <span className="text-sm text-gray-500">{Math.round((step / totalSteps) * 100)}%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div 
                   className="bg-kagzat-green h-2 rounded-full transition-all duration-300 ease-out"
-                  style={{ width: `${(step / 4) * 100}%` }}
+                  style={{ width: `${(step / totalSteps) * 100}%` }}
                 ></div>
               </div>
             </div>
           )}
 
           {/* Back Button */}
-          {step > 1 && step < 5 && (
+          {step > 1 && step < 6 && (
             <div className="mb-6">
               <Button variant="ghost" onClick={handleBack} className="text-gray-600 hover:text-kagzat-black">
                 <ArrowLeft className="h-4 w-4 mr-2" />
