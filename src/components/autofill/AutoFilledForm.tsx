@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Edit, FileText, Info, Eye, AlertTriangle } from 'lucide-react';
+import { CheckCircle, Edit, FileText, Info, Eye, User, Database } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface AutoFilledFormProps {
@@ -36,56 +36,44 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
     degreeClassification: true
   });
 
-  const autoFilledFields = [
+  const profileFields = [
     {
       key: 'fullName',
       label: 'Full Name',
-      confidence: 95,
-      source: 'Harvard_Transcript.pdf, page 1',
+      source: 'Profile: Personal Information',
       required: true
     },
     {
       key: 'studentId',
       label: 'Student ID',
-      confidence: 98,
-      source: 'Student_ID_Card.jpg',
+      source: 'Profile: Education Details',
       required: true
     },
     {
       key: 'email',
       label: 'Email Address',
-      confidence: 92,
-      source: 'Harvard_Transcript.pdf, page 1',
+      source: 'Profile: Contact Information',
       required: true
     },
     {
       key: 'graduationYear',
       label: 'Graduation Year',
-      confidence: 100,
-      source: 'Diploma_Certificate.pdf',
+      source: 'Profile: Education Details',
       required: true
     },
     {
       key: 'program',
       label: 'Program',
-      confidence: 96,
-      source: 'Diploma_Certificate.pdf',
+      source: 'Profile: Education Details',
       required: true
     },
     {
       key: 'degreeClassification',
       label: 'Degree Classification',
-      confidence: 78,
-      source: 'Harvard_Transcript.pdf, page 2',
+      source: 'Profile: Education Details',
       required: false
     }
   ];
-
-  const getConfidenceBadge = (confidence: number) => {
-    if (confidence >= 90) return { color: 'bg-green-100 text-green-800', label: 'High' };
-    if (confidence >= 70) return { color: 'bg-yellow-100 text-yellow-800', label: 'Medium' };
-    return { color: 'bg-red-100 text-red-800', label: 'Low' };
-  };
 
   const toggleVerification = (field: string) => {
     setVerificationStatus(prev => ({
@@ -99,7 +87,7 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Harvard MBA Verification Request</h2>
-          <p className="text-gray-600">Review and verify the auto-filled information before submission</p>
+          <p className="text-gray-600">Review the auto-populated information from your profile</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -108,14 +96,13 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
             <Card className="shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <span>Auto-Filled Information</span>
+                  <User className="h-5 w-5 text-blue-600" />
+                  <span>Auto-Populated from Profile</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Auto-filled Fields */}
-                {autoFilledFields.map((field) => {
-                  const confidenceBadge = getConfidenceBadge(field.confidence);
+                {/* Profile-populated Fields */}
+                {profileFields.map((field) => {
                   const isVerified = verificationStatus[field.key as keyof typeof verificationStatus];
                   
                   return (
@@ -126,15 +113,15 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
                           {field.required && <span className="text-red-500">*</span>}
                         </Label>
                         <div className="flex items-center space-x-2">
-                          <Badge className={confidenceBadge.color}>
-                            {field.confidence}% {confidenceBadge.label}
+                          <Badge className="bg-blue-100 text-blue-800">
+                            Profile Data
                           </Badge>
                           <Tooltip>
                             <TooltipTrigger>
                               <Info className="h-4 w-4 text-gray-400" />
                             </TooltipTrigger>
                             <TooltipContent>
-                              <p>Extracted from: {field.source}</p>
+                              <p>Source: {field.source}</p>
                             </TooltipContent>
                           </Tooltip>
                         </div>
@@ -147,7 +134,7 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
                             ...prev,
                             [field.key]: e.target.value
                           }))}
-                          className={`pr-20 ${isVerified ? 'bg-green-50 border-green-300' : 'bg-white'}`}
+                          className={`pr-20 ${isVerified ? 'bg-blue-50 border-blue-300' : 'bg-white'}`}
                         />
                         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-1">
                           <Button
@@ -155,7 +142,7 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
                             variant="ghost"
                             size="sm"
                             onClick={() => toggleVerification(field.key)}
-                            className={`p-1 h-6 w-6 ${isVerified ? 'text-green-600' : 'text-gray-400'}`}
+                            className={`p-1 h-6 w-6 ${isVerified ? 'text-blue-600' : 'text-gray-400'}`}
                           >
                             <CheckCircle className="h-4 w-4" />
                           </Button>
@@ -233,21 +220,21 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
             {/* Document Attachments */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Document Attachments</CardTitle>
+                <CardTitle className="text-lg">Linked Documents</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {[
-                  { name: "Harvard_Official_Transcript.pdf", status: "auto-attached", icon: FileText },
-                  { name: "Student_ID_Card.jpg", status: "auto-attached", icon: FileText },
-                  { name: "Diploma_Certificate.pdf", status: "auto-attached", icon: FileText }
+                  { name: "Harvard_Official_Transcript.pdf", status: "from-profile", icon: FileText },
+                  { name: "Student_ID_Card.jpg", status: "from-profile", icon: FileText },
+                  { name: "Diploma_Certificate.pdf", status: "from-profile", icon: FileText }
                 ].map((doc, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div className="flex items-center space-x-2">
-                      <doc.icon className="h-4 w-4 text-green-600" />
-                      <span className="text-sm font-medium text-green-800 truncate">{doc.name}</span>
+                      <doc.icon className="h-4 w-4 text-blue-600" />
+                      <span className="text-sm font-medium text-blue-800 truncate">{doc.name}</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <CheckCircle className="h-4 w-4 text-blue-600" />
                       <Button variant="ghost" size="sm" className="p-1">
                         <Eye className="h-4 w-4" />
                       </Button>
@@ -257,34 +244,34 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
               </CardContent>
             </Card>
 
-            {/* Confidence Summary */}
+            {/* Profile Summary */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Auto-Fill Summary</CardTitle>
+                <CardTitle className="text-lg">Profile Auto-Fill Summary</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Fields Auto-Filled</span>
+                    <span className="text-sm text-gray-600">Fields Auto-Populated</span>
                     <span className="font-semibold">6/9</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Average Confidence</span>
-                    <span className="font-semibold text-green-600">93%</span>
+                    <span className="text-sm text-gray-600">Data Source</span>
+                    <span className="font-semibold text-blue-600">Your Profile</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-gray-600">Manual Review</span>
-                    <span className="font-semibold text-yellow-600">1 field</span>
+                    <span className="text-sm text-gray-600">Manual Input Required</span>
+                    <span className="font-semibold text-orange-600">3 fields</span>
                   </div>
                 </div>
                 
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-start space-x-2">
-                    <Info className="h-4 w-4 text-blue-600 mt-0.5" />
+                    <Database className="h-4 w-4 text-green-600 mt-0.5" />
                     <div>
-                      <p className="text-sm font-medium text-blue-800">Auto-Fill Benefits</p>
-                      <p className="text-xs text-blue-600 mt-1">
-                        Saved ~5 minutes of manual entry with 93% accuracy
+                      <p className="text-sm font-medium text-green-800">Profile Benefits</p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Saved ~5 minutes by using your verified profile information
                       </p>
                     </div>
                   </div>
@@ -296,16 +283,17 @@ const AutoFilledForm = ({ onNext }: AutoFilledFormProps) => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center space-x-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-500" />
-                  <span>Need Help?</span>
+                  <Info className="h-5 w-5 text-blue-500" />
+                  <span>How This Works</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-gray-600">
-                <p>If any auto-filled information seems incorrect, you can:</p>
+                <p>We use information from your Kagzat profile to automatically fill forms:</p>
                 <ul className="mt-2 space-y-1 list-disc list-inside">
-                  <li>Click the edit button to modify</li>
-                  <li>Uncheck verification boxes</li>
-                  <li>Upload additional documents</li>
+                  <li>Personal details from your profile</li>
+                  <li>Education records you've added</li>
+                  <li>Previously uploaded documents</li>
+                  <li>Contact information</li>
                 </ul>
               </CardContent>
             </Card>
