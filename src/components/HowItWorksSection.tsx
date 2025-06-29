@@ -37,25 +37,25 @@ const HowItWorksSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
               <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div className="text-4xl mb-4">{step.icon}</div>
-                <div className="bg-kagzat-yellow text-black font-bold text-lg rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-4">
+                <div className="text-3xl mb-3">{step.icon}</div>
+                <div className="bg-kagzat-yellow text-black font-bold text-lg rounded-full w-8 h-8 flex items-center justify-center mx-auto mb-3">
                   {step.step}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{step.title}</h3>
-                <p className="text-gray-600">{step.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-gray-600 text-sm">{step.description}</p>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <div className="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">For Verifiers</h3>
-            <p className="text-gray-600 mb-4">
+        <div className="text-center">
+          <div className="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+            <h3 className="text-xl font-semibold text-gray-900 mb-3">For Verifiers</h3>
+            <p className="text-gray-600 mb-4 text-sm">
               Need to verify someone else's document? Simply use their Google Drive link 
               and username to get instant verification results.
             </p>
