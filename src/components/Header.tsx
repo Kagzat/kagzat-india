@@ -12,7 +12,7 @@ const Header = () => {
     { name: 'How it Works', href: '#how-it-works' },
     { name: 'Pricing', href: '#pricing' },
     { name: 'Verify Document', href: '/document-verification' },
-    { name: 'Sign In', href: '#signin' }
+    { name: 'Sign In', href: '/signin' }
   ];
 
   return (
@@ -45,11 +45,11 @@ const Header = () => {
                 </a>
               )
             ))}
-            <Link to="/waitlist">
+            <Link to="/role-selection">
               <Button 
                 className="bg-kagzat-yellow hover:bg-yellow-500 text-black font-semibold px-6 py-2 rounded-lg transition-all duration-200 hover:scale-105"
               >
-                Join Waitlist
+                Join the Revolution
               </Button>
             </Link>
           </nav>
@@ -93,12 +93,12 @@ const Header = () => {
                   </a>
                 )
               ))}
-              <Link to="/waitlist">
+              <Link to="/role-selection">
                 <Button 
                   className="bg-kagzat-yellow hover:bg-yellow-500 text-black font-semibold px-6 py-3 rounded-lg w-full mt-4"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Join Waitlist
+                  Join the Revolution
                 </Button>
               </Link>
             </div>

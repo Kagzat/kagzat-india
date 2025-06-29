@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
+import SignIn from "./pages/SignIn";
 import RoleSelection from "./pages/RoleSelection";
 import UserSignup from "./pages/UserSignup";
 import ValidatorSignup from "./pages/ValidatorSignup";
@@ -32,6 +34,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/waitlist" element={<Waitlist />} />
+          <Route path="/signin" element={<SignIn />} />
           <Route path="/role-selection" element={<RoleSelection />} />
           <Route path="/signup/user" element={<UserSignup />} />
           <Route path="/signup/validator" element={<ValidatorSignup />} />

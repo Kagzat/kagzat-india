@@ -1,6 +1,7 @@
 
 import { FileCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   return (
@@ -19,12 +20,14 @@ const HeroSection = () => {
             </p>
 
             <div className="flex justify-center lg:justify-start">
-              <Button 
-                className="bg-kagzat-green hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
-              >
-                Join the Revolution
-                <ArrowRight className="h-5 w-5" />
-              </Button>
+              <Link to="/role-selection">
+                <Button 
+                  className="bg-kagzat-green hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-lg text-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
+                >
+                  Join the Revolution
+                  <ArrowRight className="h-5 w-5" />
+                </Button>
+              </Link>
             </div>
 
             {/* Stats */}
