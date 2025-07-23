@@ -1,9 +1,11 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { useAuthStore } from "@/store/authStore";
+import { toast } from "@/hooks/use-toast";
 import Index from "./pages/Index";
 import Waitlist from "./pages/Waitlist";
 import SignIn from "./pages/SignIn";
@@ -25,36 +27,69 @@ import OrganizationDashboard from "./pages/OrganizationDashboard";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/waitlist" element={<Waitlist />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/role-selection" element={<RoleSelection />} />
-          <Route path="/signup/user" element={<UserSignup />} />
-          <Route path="/signup/validator" element={<ValidatorSignup />} />
-          <Route path="/signup/organization" element={<OrganizationSignup />} />
-          <Route path="/onboarding/user" element={<UserOnboarding />} />
-          <Route path="/onboarding/validator" element={<ValidatorOnboarding />} />
-          <Route path="/onboarding/organization" element={<OrganizationOnboarding />} />
-          <Route path="/form-builder" element={<FormBuilder />} />
-          <Route path="/search" element={<Search />} />
-          <Route path="/autofill-demo" element={<AutoFillDemo />} />
-          <Route path="/document-verification" element={<DocumentVerification />} />
-          <Route path="/validator-dashboard" element={<ValidatorDashboard />} />
-          <Route path="/user-dashboard" element={<UserDashboard />} />
-          <Route path="/organization-dashboard" element={<OrganizationDashboard />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    // Show toast only if user is present and just signed in
+    if (user) {
+      toast({
+        title: "Success!",
+        description: "sign-up successful",
+      });
+      // Optionally, you can clear user or set a flag to avoid duplicate toasts
+    }
+  }, [user]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/waitlist" element={<Waitlist />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/role-selection" element={<RoleSelection />} />
+            <Route path="/signup/user" element={<UserSignup />} />
+            <Route path="/signup/validator" element={<ValidatorSignup />} />
+            <Route
+              path="/signup/organization"
+              element={<OrganizationSignup />}
+            />
+            <Route path="/onboarding/user" element={<UserOnboarding />} />
+            <Route
+              path="/onboarding/validator"
+              element={<ValidatorOnboarding />}
+            />
+            <Route
+              path="/onboarding/organization"
+              element={<OrganizationOnboarding />}
+            />
+            <Route path="/form-builder" element={<FormBuilder />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/autofill-demo" element={<AutoFillDemo />} />
+            <Route
+              path="/document-verification"
+              element={<DocumentVerification />}
+            />
+            <Route
+              path="/validator-dashboard"
+              element={<ValidatorDashboard />}
+            />
+            <Route path="/user-dashboard" element={<UserDashboard />} />
+            <Route
+              path="/organization-dashboard"
+              element={<OrganizationDashboard />}
+            />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
