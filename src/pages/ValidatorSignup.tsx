@@ -8,6 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Link, useNavigate } from 'react-router-dom';
+import { validateEmailAndPassword } from '@/lib/validate';
+import { toast } from '@/hooks/use-toast';
+import { useAuthStore } from "@/store/authStore";
+
 
 const ValidatorSignup = () => {
   const navigate = useNavigate();
@@ -24,19 +28,58 @@ const ValidatorSignup = () => {
   const [experience, setExperience] = useState(5);
   const [specializations, setSpecializations] = useState<string[]>([]);
 
+  const { loading, signupWithEmail, signupWithGoogle } = useAuthStore();
+
   const handleGoogleSignup = async () => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    setStep(2);
+    const result = await signupWithGoogle();
+    if (result?.success) {
+      toast({
+        title: "Success!",
+        description: "Google sign-up successful",
+      });
+      // Optionally navigate or update step
+    } else {
+      toast({
+        title: "Error!",
+        description: result?.error || "Google sign-up failed",
+      });
+    }
   };
 
   const handleEmailSignup = async () => {
     if (!email || !password) return;
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep(2);
+    const { isValid, isEmailValid, isPasswordValid } = validateEmailAndPassword(
+      email,
+      password
+    );
+    if (!isEmailValid) {
+      toast({
+        title: "Error in Email",
+        description: "Please enter a valid email address",
+      });
+      return;
+    } else if (!isPasswordValid) {
+      toast({
+        title: "Error in password",
+        description:
+          "The password must contain: min 8 characters, atleast one upper and lower case letters, atleast one digit and atleast one special character",
+      });
+      return;
+    }
+
+    const result = await signupWithEmail(email, password);
+    if (result?.success) {
+      toast({
+        title: "Success!",
+        description: "Sign up successful",
+      });
+      // Optionally update step or navigate
+    } else {
+      toast({
+        title: "Error!",
+        description: result?.error || "Sign up failed",
+      });
+    }
   };
 
   const handleProfessionalInfo = () => {
