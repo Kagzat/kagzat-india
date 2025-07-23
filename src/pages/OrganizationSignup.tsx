@@ -42,13 +42,7 @@ const OrganizationSignup = () => {
 
   const handleGoogleSignup = async () => {
     const result = await signupWithGoogle();
-    if (result?.success) {
-      toast({
-        title: "Success!",
-        description: "Google sign-up successful",
-      });
-      // Optionally navigate or update step
-    } else {
+    if (!result?.success) {
       toast({
         title: "Error!",
         description: result?.error || "Google sign-up failed",
@@ -77,18 +71,20 @@ const OrganizationSignup = () => {
       return;
     }
 
-    const result = await signupWithEmail(email, password);
-    if (result?.success) {
-      toast({
-        title: "Success!",
-        description: "Sign up successful",
-      });
-      // Optionally update step or navigate
-    } else {
-      toast({
-        title: "Error!",
-        description: result?.error || "Sign up failed",
-      });
+    if (isValid) {
+      const result = await signupWithEmail(email, password);
+      if (result?.success) {
+        toast({
+          title: "Success!",
+          description: "Sign up successful",
+        });
+        // Optionally update step or navigate
+      } else {
+        toast({
+          title: "Error!",
+          description: result?.error || "Sign up failed",
+        });
+      }
     }
   };
 

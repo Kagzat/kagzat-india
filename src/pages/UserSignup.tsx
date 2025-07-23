@@ -30,18 +30,13 @@ const UserSignup = () => {
 
   const handleGoogleSignup = async () => {
     const result = await signupWithGoogle();
-    if (result?.success) {
-      toast({
-        title: "Success!",
-        description: "Google sign-up successful",
-      });
-      // Optionally navigate or update step
-    } else {
+    if (!result?.success) {
       toast({
         title: "Error!",
         description: result?.error || "Google sign-up failed",
       });
     }
+    // Do not show success toast here; it will show after redirect in global logic
   };
 
   const handleEmailSignup = async () => {
