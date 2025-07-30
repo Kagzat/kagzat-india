@@ -15,7 +15,7 @@ const HeroSection = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl">
-              Secure, verifiable, instant document validation for the digital age
+              A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies. Made in India. Built for the world.
             </p>
 
             <div className="flex justify-center lg:justify-start">
