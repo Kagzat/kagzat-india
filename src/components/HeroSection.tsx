@@ -11,8 +11,7 @@ const HeroSection = () => {
           {/* Content */}
           <div className="flex-1 text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-kagzat-black mb-6 leading-tight">
-              Transform Document 
-              <span className="text-kagzat-green block">Workflows Forever</span>
+              1000% more efficient document and data exchange protocol.
             </h1>
             
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl">
