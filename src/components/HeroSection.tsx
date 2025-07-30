@@ -14,8 +14,12 @@ const HeroSection = () => {
               1000% more efficient document and data exchange protocol.
             </h1>
             
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl">
-              A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies. Made in India. Built for the world.
+            <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl">
+              A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies.
+            </p>
+            
+            <p className="text-lg md:text-xl text-kagzat-green font-semibold mb-8">
+              Made in India. Built for the world.
             </p>
 
             <div className="flex justify-center lg:justify-start">
