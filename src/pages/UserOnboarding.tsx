@@ -296,86 +296,29 @@ const UserOnboarding = () => {
   };
 
   const renderStep1 = () => (
-    <div className="space-y-8">
-      {/* Category Selection */}
-      <div className="space-y-6">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-kagzat-black mb-2">Select Document Categories & Fill Information</h2>
-          <p className="text-gray-600">Choose the types of documents you have and complete your details</p>
-        </div>
-
-        <div className="grid gap-4">
-          {documentCategoryConfig.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Card
-                key={category.id}
-                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                  userData.selectedCategories.includes(category.id)
-                    ? 'border-kagzat-green bg-kagzat-green/5'
-                    : 'border-gray-200'
-                }`}
-                onClick={() => handleCategoryToggle(category.id)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-4">
-                    <Checkbox
-                      checked={userData.selectedCategories.includes(category.id)}
-                      onChange={() => handleCategoryToggle(category.id)}
-                      className="mt-1"
-                    />
-                    <Icon className="h-6 w-6 text-kagzat-green mt-1" />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-kagzat-black mb-1">{category.title}</h3>
-                      <p className="text-gray-600 text-sm mb-2">{category.description}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {documentLibrary[category.id as keyof typeof documentLibrary].slice(0, 3).map((type, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {formatDocumentName(type)}
-                          </Badge>
-                        ))}
-                        {documentLibrary[category.id as keyof typeof documentLibrary].length > 3 && (
-                          <Badge variant="secondary" className="text-xs">
-                            +{documentLibrary[category.id as keyof typeof documentLibrary].length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Complete Your Information</h2>
+        <p className="text-gray-600">Fill out your details across different document categories</p>
       </div>
 
-      {/* Accordion Form - Only show if categories are selected */}
-      {userData.selectedCategories.length > 0 && (
-        <div className="space-y-6">
-          <div className="border-t pt-8">
-            <h3 className="text-xl font-bold text-kagzat-black mb-4">Complete Your Information</h3>
-            <p className="text-gray-600 mb-6">Fill out the details for your selected categories</p>
-            
-            <CategoryAccordionForm
-              value={{
-                Identity: userData.Identity,
-                Address: userData.Address,
-                Education: userData.Education,
-                Work: userData.Work,
-                Finances: userData.Finances,
-                Property: userData.Property,
-                Miscellaneous: userData.Miscellaneous,
-              }}
-              onChange={(category, fieldName, value) =>
-                handleFieldChange(category as keyof typeof formFieldLibrary, fieldName, value)
-              }
-              errors={errors}
-              showHeader={false}
-              showActions={false}
-            />
-          </div>
-        </div>
-      )}
+      <CategoryAccordionForm
+        value={{
+          Identity: userData.Identity,
+          Address: userData.Address,
+          Education: userData.Education,
+          Work: userData.Work,
+          Finances: userData.Finances,
+          Property: userData.Property,
+          Miscellaneous: userData.Miscellaneous,
+        }}
+        onChange={(category, fieldName, value) =>
+          handleFieldChange(category as keyof typeof formFieldLibrary, fieldName, value)
+        }
+        errors={errors}
+        showHeader={false}
+        showActions={false}
+      />
     </div>
   );
 
@@ -603,7 +546,7 @@ const UserOnboarding = () => {
 
   const totalSteps = 4;
   const stepTitles = [
-    'Categories & Details',
+    'Personal Information',
     'Document Links',
     'Preferences',
     'Complete'
