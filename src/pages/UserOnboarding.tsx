@@ -150,7 +150,7 @@ const UserOnboarding = () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 2000));
     setIsLoading(false);
-    setStep(6); // Success screen
+    setStep(4); // Success screen
   };
 
   const handleCategoryToggle = (categoryId: string) => {
@@ -219,58 +219,6 @@ const UserOnboarding = () => {
     setAddingToCategory('');
   };
 
-  const renderStep1 = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Select Document Categories</h2>
-        <p className="text-gray-600">Choose the types of documents you have</p>
-      </div>
-
-      <div className="grid gap-4">
-        {documentCategoryConfig.map((category) => {
-          const Icon = category.icon;
-          return (
-            <Card
-              key={category.id}
-              className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                userData.selectedCategories.includes(category.id)
-                  ? 'border-kagzat-green bg-kagzat-green/5'
-                  : 'border-gray-200'
-              }`}
-              onClick={() => handleCategoryToggle(category.id)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-start gap-4">
-                  <Checkbox
-                    checked={userData.selectedCategories.includes(category.id)}
-                    onChange={() => handleCategoryToggle(category.id)}
-                    className="mt-1"
-                  />
-                  <Icon className="h-6 w-6 text-kagzat-green mt-1" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-kagzat-black mb-1">{category.title}</h3>
-                    <p className="text-gray-600 text-sm mb-2">{category.description}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {documentLibrary[category.id as keyof typeof documentLibrary].slice(0, 3).map((type, index) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {formatDocumentName(type)}
-                        </Badge>
-                      ))}
-                      {documentLibrary[category.id as keyof typeof documentLibrary].length > 3 && (
-                        <Badge variant="secondary" className="text-xs">
-                          +{documentLibrary[category.id as keyof typeof documentLibrary].length - 3} more
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-    </div>
-  );
 
   const renderCategoryFields = (category: keyof typeof formFieldLibrary) => {
     const fields = formFieldLibrary[category];
@@ -347,34 +295,91 @@ const UserOnboarding = () => {
     );
   };
 
-  const renderStep2 = () => (
-    <div className="space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-kagzat-black mb-2">Fill Your Information</h2>
-        <p className="text-gray-600">Complete the details for your categories</p>
+  const renderStep1 = () => (
+    <div className="space-y-8">
+      {/* Category Selection */}
+      <div className="space-y-6">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-kagzat-black mb-2">Select Document Categories & Fill Information</h2>
+          <p className="text-gray-600">Choose the types of documents you have and complete your details</p>
+        </div>
+
+        <div className="grid gap-4">
+          {documentCategoryConfig.map((category) => {
+            const Icon = category.icon;
+            return (
+              <Card
+                key={category.id}
+                className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                  userData.selectedCategories.includes(category.id)
+                    ? 'border-kagzat-green bg-kagzat-green/5'
+                    : 'border-gray-200'
+                }`}
+                onClick={() => handleCategoryToggle(category.id)}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    <Checkbox
+                      checked={userData.selectedCategories.includes(category.id)}
+                      onChange={() => handleCategoryToggle(category.id)}
+                      className="mt-1"
+                    />
+                    <Icon className="h-6 w-6 text-kagzat-green mt-1" />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-kagzat-black mb-1">{category.title}</h3>
+                      <p className="text-gray-600 text-sm mb-2">{category.description}</p>
+                      <div className="flex flex-wrap gap-1">
+                        {documentLibrary[category.id as keyof typeof documentLibrary].slice(0, 3).map((type, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {formatDocumentName(type)}
+                          </Badge>
+                        ))}
+                        {documentLibrary[category.id as keyof typeof documentLibrary].length > 3 && (
+                          <Badge variant="secondary" className="text-xs">
+                            +{documentLibrary[category.id as keyof typeof documentLibrary].length - 3} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
-      <CategoryAccordionForm
-        value={{
-          Identity: userData.Identity,
-          Address: userData.Address,
-          Education: userData.Education,
-          Work: userData.Work,
-          Finances: userData.Finances,
-          Property: userData.Property,
-          Miscellaneous: userData.Miscellaneous,
-        }}
-        onChange={(category, fieldName, value) =>
-          handleFieldChange(category as keyof typeof formFieldLibrary, fieldName, value)
-        }
-        errors={errors}
-        showHeader={false}
-        showActions={false}
-      />
+      {/* Accordion Form - Only show if categories are selected */}
+      {userData.selectedCategories.length > 0 && (
+        <div className="space-y-6">
+          <div className="border-t pt-8">
+            <h3 className="text-xl font-bold text-kagzat-black mb-4">Complete Your Information</h3>
+            <p className="text-gray-600 mb-6">Fill out the details for your selected categories</p>
+            
+            <CategoryAccordionForm
+              value={{
+                Identity: userData.Identity,
+                Address: userData.Address,
+                Education: userData.Education,
+                Work: userData.Work,
+                Finances: userData.Finances,
+                Property: userData.Property,
+                Miscellaneous: userData.Miscellaneous,
+              }}
+              onChange={(category, fieldName, value) =>
+                handleFieldChange(category as keyof typeof formFieldLibrary, fieldName, value)
+              }
+              errors={errors}
+              showHeader={false}
+              showActions={false}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 
-  const renderStep3 = () => (
+  const renderStep2 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-kagzat-black mb-2">Share Your Document Links</h2>
@@ -476,7 +481,7 @@ const UserOnboarding = () => {
     </div>
   );
 
-  const renderStep4 = () => (
+  const renderStep3 = () => (
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-kagzat-black mb-2">Set Your Preferences</h2>
@@ -557,7 +562,7 @@ const UserOnboarding = () => {
     </div>
   );
 
-  const renderStep5 = () => (
+  const renderStep4 = () => (
     <div className="text-center space-y-6 animate-scale-in">
       <div className="h-20 w-20 mx-auto mb-6 bg-kagzat-green/10 rounded-full flex items-center justify-center">
         <span className="text-4xl">🎉</span>
@@ -596,10 +601,9 @@ const UserOnboarding = () => {
     </div>
   );
 
-  const totalSteps = 5;
+  const totalSteps = 4;
   const stepTitles = [
-    'Document Categories',
-    'Category Details',
+    'Categories & Details',
     'Document Links',
     'Preferences',
     'Complete'
@@ -614,7 +618,7 @@ const UserOnboarding = () => {
             <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-kagzat-black">
               Kagzat
             </Link>
-            {step < 6 && (
+            {step < 5 && (
               <div className="text-sm text-gray-600">
                 Step {step} of {totalSteps} - {stepTitles[step - 1]}
               </div>
@@ -626,7 +630,7 @@ const UserOnboarding = () => {
       <main className="container mx-auto px-6 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Progress Bar */}
-          {step < 6 && (
+          {step < 5 && (
             <div className="mb-8">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-gray-700">Progress</span>
@@ -642,7 +646,7 @@ const UserOnboarding = () => {
           )}
 
           {/* Back Button */}
-          {step > 1 && step < 6 && (
+          {step > 1 && step < 5 && (
             <div className="mb-6">
               <Button variant="ghost" onClick={handleBack} className="text-gray-600 hover:text-kagzat-black">
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -658,12 +662,11 @@ const UserOnboarding = () => {
               {step === 2 && renderStep2()}
               {step === 3 && renderStep3()}
               {step === 4 && renderStep4()}
-              {step === 5 && renderStep5()}
             </CardContent>
           </Card>
 
           {/* Navigation Buttons */}
-          {step < 5 && (
+          {step < 3 && (
             <div className="flex items-center justify-between mt-8">
               <Button variant="outline" className="text-gray-600">
                 <Save className="h-4 w-4 mr-2" />
@@ -671,7 +674,7 @@ const UserOnboarding = () => {
               </Button>
               
               <Button
-                onClick={step === 4 ? handleComplete : handleNext}
+                onClick={step === 3 ? handleComplete : handleNext}
                 disabled={isLoading}
                 className="bg-kagzat-green hover:bg-green-600 text-white px-8"
               >
@@ -679,7 +682,7 @@ const UserOnboarding = () => {
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 ) : (
                   <>
-                    {step === 4 ? 'Complete Setup' : 'Continue'}
+                    {step === 3 ? 'Complete Setup' : 'Continue'}
                     <ArrowRight className="h-4 w-4 ml-2" />
                   </>
                 )}
