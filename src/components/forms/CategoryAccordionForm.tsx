@@ -19,24 +19,44 @@ const categoryIcons = {
   Miscellaneous: Package,
 };
 
-const CategoryAccordionForm = () => {
-  const [formData, setFormData] = useState<Record<string, Record<string, string>>>({});
-  const [errors, setErrors] = useState<Record<string, string>>({});
+interface CategoryAccordionFormProps {
+  value?: Record<string, Record<string, string>>;
+  onChange?: (category: string, fieldName: string, value: string) => void;
+  errors?: Record<string, string>;
+  showHeader?: boolean;
+  showActions?: boolean;
+}
+
+const CategoryAccordionForm: React.FC<CategoryAccordionFormProps> = ({
+  value,
+  onChange,
+  errors: externalErrors,
+  showHeader = true,
+  showActions = true,
+}) => {
+  const [internalFormData, setInternalFormData] = useState<Record<string, Record<string, string>>>({});
+  const [internalErrors, setInternalErrors] = useState<Record<string, string>>({});
+  const errors = externalErrors ?? internalErrors;
+  const formData = value ?? internalFormData;
   const { toast } = useToast();
 
   const handleFieldChange = (category: string, fieldName: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category],
-        [fieldName]: value
-      }
-    }));
+    if (onChange) {
+      onChange(category, fieldName, value);
+    } else {
+      setInternalFormData(prev => ({
+        ...prev,
+        [category]: {
+          ...prev[category],
+          [fieldName]: value
+        }
+      }));
+    }
 
-    // Clear error when user starts typing
+    // Clear error when user starts typing (only for internal errors)
     const errorKey = `${category}.${fieldName}`;
-    if (errors[errorKey]) {
-      setErrors(prev => {
+    if (!externalErrors && internalErrors[errorKey]) {
+      setInternalErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[errorKey];
         return newErrors;
@@ -61,7 +81,9 @@ const CategoryAccordionForm = () => {
       });
     });
 
-    setErrors(newErrors);
+    if (!externalErrors) {
+      setInternalErrors(newErrors);
+    }
     return isValid;
   };
 
@@ -105,28 +127,37 @@ const CategoryAccordionForm = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-2xl font-bold">Document Categories Form</CardTitle>
-              <p className="text-muted-foreground mt-1">
-                Fill out information across different categories. Expand each category to view and edit fields.
-              </p>
+      {(showHeader || showActions) && (
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                {showHeader && (
+                  <>
+                    <CardTitle className="text-2xl font-bold">Document Categories Form</CardTitle>
+                    <p className="text-muted-foreground mt-1">
+                      Fill out information across different categories. Expand each category to view and edit fields.
+                    </p>
+                  </>
+                )}
+              </div>
+              {showActions && (
+                <div className="flex items-center space-x-2">
+                  <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Form
+                  </Button>
+                  <Button variant="outline" onClick={handleExport}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                </div>
+              )}
             </div>
-            <div className="flex items-center space-x-2">
-              <Button onClick={handleSave} className="bg-primary hover:bg-primary/90">
-                <Save className="h-4 w-4 mr-2" />
-                Save Form
-              </Button>
-              <Button variant="outline" onClick={handleExport}>
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+          </CardHeader>
+        </Card>
+      )}
+
 
       {/* Category Accordions */}
       <Accordion type="multiple" className="space-y-4">

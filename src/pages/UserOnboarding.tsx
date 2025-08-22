@@ -15,6 +15,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { format } from 'date-fns';
 import { Link, useNavigate } from 'react-router-dom';
 import { formFieldLibrary, documentLibrary, formatFieldName, formatDocumentName, validateField } from '@/lib/formLibrary';
+import CategoryAccordionForm from '@/components/forms/CategoryAccordionForm';
 
 interface UserData {
   // Basic info
@@ -350,12 +351,26 @@ const UserOnboarding = () => {
     <div className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-kagzat-black mb-2">Fill Your Information</h2>
-        <p className="text-gray-600">Complete the details for your selected categories</p>
+        <p className="text-gray-600">Complete the details for your categories</p>
       </div>
 
-      {userData.selectedCategories.map((categoryId) => 
-        renderCategoryFields(categoryId as keyof typeof formFieldLibrary)
-      )}
+      <CategoryAccordionForm
+        value={{
+          Identity: userData.Identity,
+          Address: userData.Address,
+          Education: userData.Education,
+          Work: userData.Work,
+          Finances: userData.Finances,
+          Property: userData.Property,
+          Miscellaneous: userData.Miscellaneous,
+        }}
+        onChange={(category, fieldName, value) =>
+          handleFieldChange(category as keyof typeof formFieldLibrary, fieldName, value)
+        }
+        errors={errors}
+        showHeader={false}
+        showActions={false}
+      />
     </div>
   );
 
@@ -584,7 +599,7 @@ const UserOnboarding = () => {
   const totalSteps = 5;
   const stepTitles = [
     'Document Categories',
-    'Personal Information',
+    'Category Details',
     'Document Links',
     'Preferences',
     'Complete'
