@@ -11,13 +11,14 @@ const HeroSection = () => {
           {/* Content */}
           <div className="flex-1 text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-kagzat-black mb-6 leading-tight">
-           Fill forms with attached documents in a click. Validate your documents with ease. Keep your files and data with you.Organize it with the kagzat protocol        
+                          1000% more efficient document and data exchange protocol.        
 
             </h1>
             
         
               <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl">
-                1000% more efficient document and data exchange protocol. A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies.
+                A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies.
+ Fill forms with attached documents in a click. Validate your documents with ease. Keep your files and data with you.Organize it with the kagzat protocol 
             </p>
             
 
