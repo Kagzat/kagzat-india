@@ -14,10 +14,11 @@ const HeroSection = () => {
                           1000% more efficient document and data exchange protocol.        
 
             </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies
+</p>
             
         
-              <ul className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">
-                <li>A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies</li>
+              <ol className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">
                 <li>Fill forms with attached documents in a click</li>
                 <li>Validate your documents with ease</li>
                 <li>Keep your files and data with you</li>
