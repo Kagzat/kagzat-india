@@ -18,7 +18,7 @@ const HeroSection = () => {
 </p>
             
         
-              <ol className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">
+              <ul className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">
                 <li>Fill forms with attached documents in a click</li>
                 <li>Validate your documents with ease</li>
                 <li>Keep your files and data with you</li>
