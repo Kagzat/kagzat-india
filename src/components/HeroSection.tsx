@@ -16,10 +16,13 @@ const HeroSection = () => {
             </h1>
             
         
-              <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl">
-                A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies.
- Fill forms with attached documents in a click. Validate your documents with ease. Keep your files and data with you.Organize it with the kagzat protocol 
-            </p>
+              <ul className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">
+                <li>A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies</li>
+                <li>Fill forms with attached documents in a click</li>
+                <li>Validate your documents with ease</li>
+                <li>Keep your files and data with you</li>
+                <li>Organize it with the kagzat protocol</li>
+            </ul>
             
 
             <div className="flex justify-center lg:justify-start">
