@@ -29,19 +29,6 @@ const roleOptions: RoleOption[] = [
     signupPath: '/signup/user'
   },
   {
-    id: 'validator',
-    title: 'Professional Validator',
-    description: 'I validate documents as a certified professional (notary, lawyer, etc.)',
-    icon: Badge,
-    features: [
-      'Validate documents in your expertise area',
-      'Set your own pricing',
-      'Manage validation queue',
-      'Earn from validations'
-    ],
-    signupPath: '/signup/validator'
-  },
-  {
     id: 'organization',
     title: 'Institution',
     description: 'We validate documents as an educational institution, bank, or government body',
