@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const ValidatorSignup = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Account, 2: Professional Info, 3: Phone, 4: Complete
+  const [step, setStep] = useState(1); // 1: Account, 2: Phone, 3: Complete
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -19,10 +19,6 @@ const ValidatorSignup = () => {
   const [phone, setPhone] = useState('');
   const [otp, setOtp] = useState('');
   const [codeSent, setCodeSent] = useState(false);
-  const [professionalTitle, setProfessionalTitle] = useState('');
-  const [licenseNumber, setLicenseNumber] = useState('');
-  const [experience, setExperience] = useState(5);
-  const [specializations, setSpecializations] = useState<string[]>([]);
 
   const handleGoogleSignup = async () => {
     setIsLoading(true);
@@ -39,11 +35,6 @@ const ValidatorSignup = () => {
     setStep(2);
   };
 
-  const handleProfessionalInfo = () => {
-    if (!professionalTitle || !licenseNumber) return;
-    setStep(3);
-  };
-
   const handleSendCode = async () => {
     if (!phone) return;
     setIsLoading(true);
@@ -58,18 +49,8 @@ const ValidatorSignup = () => {
     setIsLoading(true);
     await new Promise(resolve => setTimeout(resolve, 1500));
     setIsLoading(false);
-    setStep(4);
+    setStep(3);
   };
-
-  const handleSpecializationChange = (spec: string, checked: boolean) => {
-    if (checked) {
-      setSpecializations([...specializations, spec]);
-    } else {
-      setSpecializations(specializations.filter(s => s !== spec));
-    }
-  };
-
-  const specializationOptions = ['Legal', 'Educational', 'Financial', 'Medical', 'Government', 'Technical'];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50">
@@ -81,7 +62,7 @@ const ValidatorSignup = () => {
               Kagzat
             </Link>
             <div className="text-sm text-gray-600">
-              Step {step + 1} of 5
+              Step {step} of 3
             </div>
           </div>
         </div>
@@ -104,8 +85,7 @@ const ValidatorSignup = () => {
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-kagzat-black">
                 {step === 1 ? 'Create Your Account' : 
-                 step === 2 ? 'Professional Information' :
-                 step === 3 ? 'Verify Your Phone' : 'Welcome to Kagzat!'}
+                 step === 2 ? 'Verify Your Phone' : 'Welcome to Kagzat!'}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -189,78 +169,6 @@ const ValidatorSignup = () => {
 
               {step === 2 && (
                 <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="title">Professional Title</Label>
-                    <select
-                      id="title"
-                      value={professionalTitle}
-                      onChange={(e) => setProfessionalTitle(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="">Select your profession</option>
-                      <option value="notary">Notary Public</option>
-                      <option value="lawyer">Lawyer</option>
-                      <option value="accountant">Certified Accountant</option>
-                      <option value="doctor">Medical Doctor</option>
-                      <option value="engineer">Professional Engineer</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="license">License/Registration Number</Label>
-                    <Input
-                      id="license"
-                      value={licenseNumber}
-                      onChange={(e) => setLicenseNumber(e.target.value)}
-                      placeholder="Enter your license number"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="experience">Years of Experience: {experience}</Label>
-                    <input
-                      id="experience"
-                      type="range"
-                      min="0"
-                      max="50"
-                      value={experience}
-                      onChange={(e) => setExperience(Number(e.target.value))}
-                      className="w-full mt-2"
-                    />
-                  </div>
-
-                  <div>
-                    <Label>Specialization Areas</Label>
-                    <div className="grid grid-cols-2 gap-3 mt-2">
-                      {specializationOptions.map((spec) => (
-                        <div key={spec} className="flex items-center space-x-2">
-                          <Checkbox
-                            id={spec}
-                            checked={specializations.includes(spec)}
-                            onCheckedChange={(checked) => 
-                              handleSpecializationChange(spec, checked as boolean)
-                            }
-                          />
-                          <Label htmlFor={spec} className="text-sm">{spec}</Label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={handleProfessionalInfo}
-                    disabled={!professionalTitle || !licenseNumber}
-                    className="w-full bg-kagzat-green hover:bg-green-600 text-white"
-                  >
-                    Continue
-                  </Button>
-                </div>
-              )}
-
-              {step === 3 && (
-                <div className="space-y-4">
                   <div className="text-center mb-6">
                     <Phone className="h-12 w-12 mx-auto mb-3 text-kagzat-green" />
                     <h3 className="text-lg font-semibold">Verify Your Phone Number</h3>
@@ -327,7 +235,7 @@ const ValidatorSignup = () => {
                 </div>
               )}
 
-              {step === 4 && (
+              {step === 3 && (
                 <div className="text-center space-y-4">
                   <div className="animate-scale-in">
                     <div className="h-16 w-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
