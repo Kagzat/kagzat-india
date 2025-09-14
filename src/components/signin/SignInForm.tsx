@@ -33,7 +33,7 @@ const SignInForm = ({ onPhoneSignIn }: SignInFormProps) => {
         title: "Success!",
         description: "Login successful",
       });
-      navigate("/role-selection");
+      navigate("/");
     } else {
       toast({
         title: "Error!",
@@ -70,7 +70,7 @@ const SignInForm = ({ onPhoneSignIn }: SignInFormProps) => {
         title: "Welcome back!",
         description: "Login successful",
       });
-      navigate("/role-selection");
+      navigate("/");
     } else {
       toast({
         title: "Error!",
