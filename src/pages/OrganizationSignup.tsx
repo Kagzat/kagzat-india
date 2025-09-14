@@ -24,7 +24,7 @@ import { toast } from "@/hooks/use-toast";
 import { useAuthStore } from "@/store/authStore";
 
 const OrganizationSignup = () => {
-  const [step, setStep] = useState(1); // 1: Account, 2: Organization Info, 3: Phone, 4: Complete
+  const [step, setStep] = useState(1); // 1: Account, 2: Phone, 3: Complete
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -32,13 +32,6 @@ const OrganizationSignup = () => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [codeSent, setCodeSent] = useState(false);
-  const [orgName, setOrgName] = useState("");
-  const [orgType, setOrgType] = useState("");
-  const [regNumber, setRegNumber] = useState("");
-  const [website, setWebsite] = useState("");
-  const [teamSize, setTeamSize] = useState("");
-
-  const { loading, signupWithEmail, signupWithGoogle } = useAuthStore();
 
   const handleGoogleSignup = async () => {
     const result = await signupWithGoogle();
@@ -88,11 +81,6 @@ const OrganizationSignup = () => {
     }
   };
 
-  const handleOrgInfo = () => {
-    if (!orgName || !orgType || !regNumber) return;
-    setStep(3);
-  };
-
   const handleSendCode = async () => {
     if (!phone) return;
     setIsLoading(true);
@@ -107,7 +95,7 @@ const OrganizationSignup = () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
-    setStep(4);
+    setStep(3);
   };
 
   const handleCompleteSignup = () => {
@@ -126,7 +114,7 @@ const OrganizationSignup = () => {
             >
               Kagzat
             </Link>
-            <div className="text-sm text-gray-600">Step {step} of 4</div>
+            <div className="text-sm text-gray-600">Step {step} of 3</div>
           </div>
         </div>
       </header>
@@ -153,8 +141,6 @@ const OrganizationSignup = () => {
                 {step === 1
                   ? "Create Your Account"
                   : step === 2
-                  ? "Organization Details"
-                  : step === 3
                   ? "Verify Your Phone"
                   : "Welcome to Kagzat!"}
               </CardTitle>
@@ -256,96 +242,6 @@ const OrganizationSignup = () => {
 
               {step === 2 && (
                 <div className="space-y-4">
-                  <div className="text-center mb-4">
-                    <Building className="h-8 w-8 mx-auto mb-2 text-kagzat-green" />
-                    <p className="text-sm text-gray-600">
-                      Tell us about your organization
-                    </p>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="orgName">Organization Name</Label>
-                    <Input
-                      id="orgName"
-                      value={orgName}
-                      onChange={(e) => setOrgName(e.target.value)}
-                      placeholder="Enter organization name"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="orgType">Organization Type</Label>
-                    <select
-                      id="orgType"
-                      value={orgType}
-                      onChange={(e) => setOrgType(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="">Select type</option>
-                      <option value="university">University/College</option>
-                      <option value="school">School</option>
-                      <option value="bank">Bank</option>
-                      <option value="government">Government Agency</option>
-                      <option value="hospital">Hospital/Healthcare</option>
-                      <option value="corporation">Corporation</option>
-                      <option value="ngo">NGO/Non-Profit</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="regNumber">Registration Number</Label>
-                    <Input
-                      id="regNumber"
-                      value={regNumber}
-                      onChange={(e) => setRegNumber(e.target.value)}
-                      placeholder="CIN, GSTIN, or registration number"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="website">Website URL (Optional)</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={website}
-                      onChange={(e) => setWebsite(e.target.value)}
-                      placeholder="https://your-website.com"
-                      className="mt-1"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="teamSize">Number of Team Members</Label>
-                    <select
-                      id="teamSize"
-                      value={teamSize}
-                      onChange={(e) => setTeamSize(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="">Select team size</option>
-                      <option value="1-10">1-10 members</option>
-                      <option value="11-50">11-50 members</option>
-                      <option value="51-200">51-200 members</option>
-                      <option value="201-1000">201-1000 members</option>
-                      <option value="1000+">1000+ members</option>
-                    </select>
-                  </div>
-
-                  <Button
-                    onClick={handleOrgInfo}
-                    disabled={!orgName || !orgType || !regNumber}
-                    className="w-full bg-kagzat-green hover:bg-green-600 text-white"
-                  >
-                    Continue
-                  </Button>
-                </div>
-              )}
-
-              {step === 3 && (
-                <div className="space-y-4">
                   <div className="text-center mb-6">
                     <Phone className="h-12 w-12 mx-auto mb-3 text-kagzat-green" />
                     <h3 className="text-lg font-semibold">
@@ -420,7 +316,7 @@ const OrganizationSignup = () => {
                 </div>
               )}
 
-              {step === 4 && (
+              {step === 3 && (
                 <div className="text-center space-y-4">
                   <div className="animate-scale-in">
                     <div className="h-16 w-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">

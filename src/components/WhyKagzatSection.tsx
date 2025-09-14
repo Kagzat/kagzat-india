@@ -1,45 +1,24 @@
 
-import { Upload, Shield, Clock, Key, UserCheck, Zap } from 'lucide-react';
+import { FolderOpen, Clock, Shield } from 'lucide-react';
 
 const WhyKagzatSection = () => {
-  const problems = [
+  const benefits = [
     {
-      icon: Upload,
-      title: "Manual Uploads",
-      description: "Repetitive form filling wastes hours of valuable time",
-      color: "from-red-50 to-red-100"
-    },
-    {
-      icon: Shield,
-      title: "Security Risks", 
-      description: "Insecure file sharing threatens privacy and data",
-      color: "from-red-50 to-red-100"
+      icon: FolderOpen,
+      title: "Organised documents remove document anxiety",
+      description: "Save your document and data links in a universal document library. Document receivers and users use the same document structure.",
+      color: "from-green-50 to-yellow-50"
     },
     {
       icon: Clock,
-      title: "Verification Delays",
-      description: "Manual processes take weeks, creating bottlenecks",
-      color: "from-red-50 to-red-100"
-    }
-  ];
-
-  const solutions = [
-    {
-      icon: Key,
-      title: "Digital Keys",
-      description: "Cryptographic identifiers ensure authenticity and prevent tampering",
+      title: "Simple validation saves time",
+      description: "Find your validator, send them your document, receive validation.",
       color: "from-green-50 to-yellow-50"
     },
     {
-      icon: UserCheck,
-      title: "Controlled Access",
-      description: "Share only what's needed with granular permissions",
-      color: "from-green-50 to-yellow-50"
-    },
-    {
-      icon: Zap,
-      title: "Instant Verification",
-      description: "Blockchain-powered validation in minutes, not weeks",
+      icon: Shield,
+      title: "Secure exchange",
+      description: "You DON'T upload any documents to kagzat.",
       color: "from-green-50 to-yellow-50"
     }
   ];
@@ -52,46 +31,23 @@ const WhyKagzatSection = () => {
             Why Choose Kagzat?
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Traditional document workflows are broken. We've built the solution that transforms how documents are shared, verified, and trusted.
+            Experience the future of document management with our secure and efficient platform.
           </p>
         </div>
 
-        {/* Problems */}
-        <div className="mb-16">
-          <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">The Problems We Solve</h3>
-          <div className="grid md:grid-cols-3 gap-6">
-            {problems.map((problem, index) => (
-              <div 
-                key={problem.title}
-                className={`bg-gradient-to-br ${problem.color} rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300`}
-              >
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                  <problem.icon className="h-6 w-6 text-red-500" />
-                </div>
-                <h4 className="text-lg font-bold text-kagzat-black mb-2">{problem.title}</h4>
-                <p className="text-gray-600 text-sm">{problem.description}</p>
+        <div className="grid md:grid-cols-3 gap-6">
+          {benefits.map((benefit, index) => (
+            <div 
+              key={benefit.title}
+              className={`bg-gradient-to-br ${benefit.color} rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-green-100`}
+            >
+              <div className="w-12 h-12 bg-kagzat-green rounded-full flex items-center justify-center mb-4">
+                <benefit.icon className="h-6 w-6 text-white" />
               </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Solutions */}
-        <div>
-          <h3 className="text-2xl font-bold text-center text-gray-900 mb-8">The Kagzat Solution</h3>
-          <div className="grid md:grid-cols-3 gap-6">
-            {solutions.map((solution, index) => (
-              <div 
-                key={solution.title}
-                className={`bg-gradient-to-br ${solution.color} rounded-xl p-6 shadow-md hover:shadow-lg transition-all duration-300 border border-green-100`}
-              >
-                <div className="w-12 h-12 bg-kagzat-green rounded-full flex items-center justify-center mb-4">
-                  <solution.icon className="h-6 w-6 text-white" />
-                </div>
-                <h4 className="text-lg font-bold text-kagzat-black mb-2">{solution.title}</h4>
-                <p className="text-gray-600 text-sm">{solution.description}</p>
-              </div>
-            ))}
-          </div>
+              <h4 className="text-lg font-bold text-kagzat-black mb-2">{benefit.title}</h4>
+              <p className="text-gray-600 text-sm">{benefit.description}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

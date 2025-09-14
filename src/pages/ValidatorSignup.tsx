@@ -18,7 +18,7 @@ import { useAuthStore } from "@/store/authStore";
 
 const ValidatorSignup = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: Account, 2: Professional Info, 3: Phone, 4: Complete
+  const [step, setStep] = useState(1); // 1: Account, 2: Phone, 3: Complete
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
@@ -26,10 +26,6 @@ const ValidatorSignup = () => {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [codeSent, setCodeSent] = useState(false);
-  const [professionalTitle, setProfessionalTitle] = useState("");
-  const [licenseNumber, setLicenseNumber] = useState("");
-  const [experience, setExperience] = useState(5);
-  const [specializations, setSpecializations] = useState<string[]>([]);
 
   const { loading, signupWithEmail, signupWithGoogle } = useAuthStore();
 
@@ -98,25 +94,8 @@ const ValidatorSignup = () => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
-    setStep(4);
+    setStep(3);
   };
-
-  const handleSpecializationChange = (spec: string, checked: boolean) => {
-    if (checked) {
-      setSpecializations([...specializations, spec]);
-    } else {
-      setSpecializations(specializations.filter((s) => s !== spec));
-    }
-  };
-
-  const specializationOptions = [
-    "Legal",
-    "Educational",
-    "Financial",
-    "Medical",
-    "Government",
-    "Technical",
-  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50">
@@ -130,6 +109,7 @@ const ValidatorSignup = () => {
             >
               Kagzat
             </Link>
+            <div className="text-sm text-gray-600">Step {step} of 3</div>
             <div className="text-sm text-gray-600">Step {step + 1} of 5</div>
           </div>
         </div>
@@ -156,6 +136,11 @@ const ValidatorSignup = () => {
           <Card className="shadow-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-kagzat-black">
+                {step === 1
+                  ? "Create Your Account"
+                  : step === 2
+                  ? "Verify Your Phone"
+                  : "Welcome to Kagzat!"}
                 {step === 1
                   ? "Create Your Account"
                   : step === 2
@@ -415,7 +400,7 @@ const ValidatorSignup = () => {
                 </div>
               )}
 
-              {step === 4 && (
+              {step === 3 && (
                 <div className="text-center space-y-4">
                   <div className="animate-scale-in">
                     <div className="h-16 w-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">

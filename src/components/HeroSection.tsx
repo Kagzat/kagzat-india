@@ -11,13 +11,20 @@ const HeroSection = () => {
           {/* Content */}
           <div className="flex-1 text-center lg:text-left animate-fade-in">
             <h1 className="text-4xl md:text-6xl font-bold text-kagzat-black mb-6 leading-tight">
-              Transform Document 
-              <span className="text-kagzat-green block">Workflows Forever</span>
+                          1000% more efficient document and data exchange protocol.        
+
             </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">A document/data validation and exchange platform that eliminates fraud and creates exponential efficiencies
+</p>
             
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-2xl">
-              Secure, verifiable, instant document validation for the digital age
-            </p>
+        
+              <ol className="text-xl md:text-2xl text-gray-600 mb-4 max-w-2xl list-disc list-inside space-y-2">
+                <li>Fill forms with attached documents in a click</li>
+                <li>Validate your documents with ease</li>
+                <li>Keep your files and data with you</li>
+                <li>Organize it with the kagzat protocol</li>
+            </ol>
+            
 
             <div className="flex justify-center lg:justify-start">
               <Link to="/waitlist">
