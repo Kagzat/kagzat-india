@@ -1,14 +1,13 @@
-
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import SignInHeader from '@/components/signin/SignInHeader';
-import SignInForm from '@/components/signin/SignInForm';
-import PhoneVerification from '@/components/signin/PhoneVerification';
-import TestingSection from '@/components/signin/TestingSection';
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import SignInHeader from "@/components/signin/SignInHeader";
+import SignInForm from "@/components/signin/SignInForm";
+import PhoneVerification from "@/components/signin/PhoneVerification";
+import TestingSection from "@/components/signin/TestingSection";
 
 const SignIn = () => {
   const [step, setStep] = useState(1);
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState("");
 
   const handlePhoneSignIn = (phoneNumber: string) => {
     setPhone(phoneNumber);
@@ -28,7 +27,7 @@ const SignIn = () => {
           <Card className="shadow-lg">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-kagzat-black">
-                {step === 1 ? 'Welcome Back' : 'Verify Your Phone'}
+                {step === 1 ? "Welcome Back" : "Verify Your Phone"}
               </CardTitle>
               {step === 1 && (
                 <p className="text-gray-600 text-sm mt-2">
@@ -40,15 +39,12 @@ const SignIn = () => {
               {step === 1 && (
                 <div className="space-y-4">
                   <SignInForm onPhoneSignIn={handlePhoneSignIn} />
-                  <TestingSection />
+                  {/* <TestingSection /> */}
                 </div>
               )}
 
               {step === 2 && (
-                <PhoneVerification
-                  phone={phone}
-                  onBack={handleBackToSignIn}
-                />
+                <PhoneVerification phone={phone} onBack={handleBackToSignIn} />
               )}
             </CardContent>
           </Card>

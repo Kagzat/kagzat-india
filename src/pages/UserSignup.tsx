@@ -1,65 +1,110 @@
-
-import { useState } from 'react';
-import { ArrowLeft, Phone, Mail, Eye, EyeOff, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { ArrowLeft, Phone, Mail, Eye, EyeOff, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { Link } from "react-router-dom";
+import { useAuthStore } from "@/store/authStore";
+import { validateEmailAndPassword } from "@/lib/validate";
+import { toast } from "../hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const UserSignup = () => {
+  const navigate = useNavigate();
+  const { loading, signupWithEmail, signupWithGoogle } = useAuthStore();
+
   const [step, setStep] = useState(1); // 1: Account, 2: Phone, 3: Google Drive
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [phone, setPhone] = useState('');
-  const [otp, setOtp] = useState('');
+  // const [isLoading, setIsLoading] = useState(loading);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [driveConnected, setDriveConnected] = useState(false);
 
   const handleGoogleSignup = async () => {
-    setIsLoading(true);
-    // Simulate Google OAuth
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsLoading(false);
-    setStep(2);
+    const result = await signupWithGoogle();
+    if (!result?.success) {
+      toast({
+        title: "Error!",
+        description: result?.error || "Google sign-up failed",
+      });
+      navigate("/");
+      return;
+    }
+    // Do not show success toast here; it will show after redirect in global logic
   };
 
   const handleEmailSignup = async () => {
     if (!email || !password) return;
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep(2);
+    const { isValid, isEmailValid, isPasswordValid } = validateEmailAndPassword(
+      email,
+      password
+    );
+    if (!isEmailValid) {
+      toast({
+        title: "Error in Email",
+        description: "Please enter a valid email address",
+      });
+      return;
+    } else if (!isPasswordValid) {
+      toast({
+        title: "Error in password",
+        description:
+          "The password must contain: min 8 characters, atleast one upper and lower case letters, atleast one digit and atleast one special character",
+      });
+      return;
+    }
+    if (!isValid) return;
+
+    const result = await signupWithEmail(email, password);
+    if (result?.success) {
+      toast({
+        title: "Success!",
+        description: "Sign up successful",
+      });
+      navigate("/");
+      // Optionally update step or navigate
+    } else {
+      toast({
+        title: "Error!",
+        description: result?.error || "Sign up failed",
+      });
+    }
   };
 
-  const handleSendCode = async () => {
-    if (!phone) return;
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setCodeSent(true);
-    setIsLoading(false);
-    // Auto-fill OTP after 3 seconds
-    setTimeout(() => setOtp('123456'), 3000);
-  };
+  // const handleSendCode = async () => {
+  //   if (!phone) return;
+  //   setIsLoading(true);
+  //   await new Promise((resolve) => setTimeout(resolve, 2000));
+  //   setCodeSent(true);
+  //   setIsLoading(false);
+  //   // Auto-fill OTP after 3 seconds
+  //   setTimeout(() => setOtp("123456"), 3000);
+  // };
 
-  const handleVerifyPhone = async () => {
-    if (otp.length !== 6) return;
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep(3);
-  };
+  // const handleVerifyPhone = async () => {
+  //   if (otp.length !== 6) return;
+  //   setIsLoading(true);
+  //   await new Promise((resolve) => setTimeout(resolve, 1500));
+  //   setIsLoading(false);
+  //   setStep(3);
+  // };
 
-  const handleConnectDrive = async () => {
-    setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setDriveConnected(true);
-    setIsLoading(false);
-  };
+  // const handleConnectDrive = async () => {
+  //   setIsLoading(true);
+  //   await new Promise((resolve) => setTimeout(resolve, 2000));
+  //   setDriveConnected(true);
+  //   setIsLoading(false);
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-gray-50">
@@ -67,12 +112,13 @@ const UserSignup = () => {
       <header className="border-b border-gray-200 bg-white/80 backdrop-blur-sm">
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 text-2xl font-bold text-kagzat-black">
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-2xl font-bold text-kagzat-black"
+            >
               Kagzat
             </Link>
-            <div className="text-sm text-gray-600">
-              Step {step + 1} of 4
-            </div>
+            <div className="text-sm text-gray-600">Step {step + 1} of 4</div>
           </div>
         </div>
       </header>
@@ -82,7 +128,10 @@ const UserSignup = () => {
           {/* Back Button & Role Badge */}
           <div className="flex items-center justify-between mb-8">
             <Link to="/role-selection">
-              <Button variant="ghost" className="text-gray-600 hover:text-kagzat-black">
+              <Button
+                variant="ghost"
+                className="text-gray-600 hover:text-kagzat-black"
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
@@ -101,18 +150,30 @@ const UserSignup = () => {
                 <div className="space-y-4">
                   <Button
                     onClick={handleGoogleSignup}
-                    disabled={isLoading}
+                    disabled={loading}
                     className="w-full bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 h-12"
                   >
-                    {isLoading ? (
+                    {loading ? (
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-kagzat-green"></div>
                     ) : (
                       <>
                         <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
-                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                          <path
+                            fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                          />
+                          <path
+                            fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                          />
+                          <path
+                            fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                          />
+                          <path
+                            fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                          />
                         </svg>
                         Sign up with Google
                       </>
@@ -156,19 +217,23 @@ const UserSignup = () => {
                           onClick={() => setShowPassword(!showPassword)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
                         >
-                          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
                     </div>
                     <Button
                       onClick={handleEmailSignup}
-                      disabled={isLoading || !email || !password}
+                      disabled={loading || !email || !password}
                       className="w-full bg-kagzat-green hover:bg-green-600 text-white"
                     >
-                      {isLoading ? (
+                      {loading ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       ) : (
-                        'Create Account'
+                        "Create Account"
                       )}
                     </Button>
                   </div>
@@ -179,8 +244,12 @@ const UserSignup = () => {
                 <div className="space-y-4">
                   <div className="text-center mb-6">
                     <Phone className="h-12 w-12 mx-auto mb-3 text-kagzat-green" />
-                    <h3 className="text-lg font-semibold">Verify Your Phone Number</h3>
-                    <p className="text-gray-600 text-sm">We'll send you a verification code</p>
+                    <h3 className="text-lg font-semibold">
+                      Verify Your Phone Number
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      We'll send you a verification code
+                    </p>
                   </div>
 
                   <div className="flex gap-2">
@@ -200,14 +269,14 @@ const UserSignup = () => {
 
                   {!codeSent ? (
                     <Button
-                      onClick={handleSendCode}
-                      disabled={isLoading || !phone}
+                      // onClick={handleSendCode}
+                      disabled={loading || !phone}
                       className="w-full bg-kagzat-green hover:bg-green-600 text-white"
                     >
-                      {isLoading ? (
+                      {loading ? (
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                       ) : (
-                        'Send Code'
+                        "Send Code"
                       )}
                     </Button>
                   ) : (
@@ -232,14 +301,14 @@ const UserSignup = () => {
                         </InputOTP>
                       </div>
                       <Button
-                        onClick={handleVerifyPhone}
-                        disabled={isLoading || otp.length !== 6}
+                        // onClick={handleVerifyPhone}
+                        disabled={loading || otp.length !== 6}
                         className="w-full bg-kagzat-green hover:bg-green-600 text-white"
                       >
-                        {isLoading ? (
+                        {loading ? (
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                         ) : (
-                          'Verify Phone'
+                          "Verify Phone"
                         )}
                       </Button>
                     </div>
@@ -251,18 +320,28 @@ const UserSignup = () => {
                 <div className="space-y-4">
                   <div className="text-center mb-6">
                     <div className="h-12 w-12 mx-auto mb-3 bg-kagzat-green/10 rounded-full flex items-center justify-center">
-                      <svg className="h-6 w-6 text-kagzat-green" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z"/>
+                      <svg
+                        className="h-6 w-6 text-kagzat-green"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M6 2c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h8c1.1 0 2-.9 2-2V8l-6-6H6zm7 7V3.5L18.5 9H13z" />
                       </svg>
                     </div>
-                    <h3 className="text-lg font-semibold">Connect Google Drive</h3>
-                    <p className="text-gray-600 text-sm">We need access to verify your documents securely</p>
+                    <h3 className="text-lg font-semibold">
+                      Connect Google Drive
+                    </h3>
+                    <p className="text-gray-600 text-sm">
+                      We need access to verify your documents securely
+                    </p>
                   </div>
 
                   {!driveConnected ? (
                     <div className="space-y-4">
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <h4 className="font-medium text-blue-900 mb-2">Why Google Drive?</h4>
+                        <h4 className="font-medium text-blue-900 mb-2">
+                          Why Google Drive?
+                        </h4>
                         <ul className="text-sm text-blue-700 space-y-1">
                           <li>• Secure document storage and access</li>
                           <li>• Easy document sharing for validation</li>
@@ -270,14 +349,14 @@ const UserSignup = () => {
                         </ul>
                       </div>
                       <Button
-                        onClick={handleConnectDrive}
-                        disabled={isLoading}
+                        // onClick={handleConnectDrive}
+                        disabled={loading}
                         className="w-full bg-kagzat-green hover:bg-green-600 text-white"
                       >
-                        {isLoading ? (
+                        {loading ? (
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                         ) : (
-                          'Connect Google Drive'
+                          "Connect Google Drive"
                         )}
                       </Button>
                     </div>
@@ -287,11 +366,17 @@ const UserSignup = () => {
                         <div className="h-16 w-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
                           <Check className="h-8 w-8 text-green-600" />
                         </div>
-                        <h3 className="text-lg font-semibold text-green-600">Google Drive Connected!</h3>
-                        <p className="text-gray-600">Your account is ready to use</p>
+                        <h3 className="text-lg font-semibold text-green-600">
+                          Google Drive Connected!
+                        </h3>
+                        <p className="text-gray-600">
+                          Your account is ready to use
+                        </p>
                       </div>
                       <Button
-                        onClick={() => window.location.href = '/onboarding/user'}
+                        onClick={() =>
+                          (window.location.href = "/onboarding/user")
+                        }
                         className="w-full bg-kagzat-yellow hover:bg-yellow-500 text-kagzat-black font-semibold"
                       >
                         Continue to Onboarding
