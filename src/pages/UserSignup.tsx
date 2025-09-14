@@ -14,8 +14,10 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "@/store/authStore";
 import { validateEmailAndPassword } from "@/lib/validate";
 import { toast } from "../hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const UserSignup = () => {
+  const navigate = useNavigate();
   const { loading, signupWithEmail, signupWithGoogle } = useAuthStore();
 
   const [step, setStep] = useState(1); // 1: Account, 2: Phone, 3: Google Drive
@@ -35,6 +37,8 @@ const UserSignup = () => {
         title: "Error!",
         description: result?.error || "Google sign-up failed",
       });
+      navigate("/");
+      return;
     }
     // Do not show success toast here; it will show after redirect in global logic
   };
@@ -59,6 +63,7 @@ const UserSignup = () => {
       });
       return;
     }
+    if (!isValid) return;
 
     const result = await signupWithEmail(email, password);
     if (result?.success) {
@@ -66,6 +71,7 @@ const UserSignup = () => {
         title: "Success!",
         description: "Sign up successful",
       });
+      navigate("/");
       // Optionally update step or navigate
     } else {
       toast({
